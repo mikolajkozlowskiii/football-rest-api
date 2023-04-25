@@ -43,6 +43,4 @@ public class User {
     private boolean isEnabled;
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
-   // @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
-   // private List<ConfirmationToken> tokens;
 }
