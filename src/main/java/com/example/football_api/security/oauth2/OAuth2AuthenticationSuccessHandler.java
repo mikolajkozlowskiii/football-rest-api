@@ -55,14 +55,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         final String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
-        authentication.getPrincipal().toString();
-
-        final String token = jwtUtils.generateJwtToken(authentication);
-
-
-        response.addHeader("Authorization", "Bearer "+token);
-
+        final String jwtToken = jwtUtils.generateJwtToken(authentication);
         return UriComponentsBuilder.fromUriString(targetUrl)
+                .queryParam("token", jwtToken)
                 .build().toUriString();
     }
 

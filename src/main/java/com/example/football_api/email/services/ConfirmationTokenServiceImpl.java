@@ -2,10 +2,10 @@ package com.example.football_api.email.services;
 
 import com.example.football_api.email.entity.ConfirmationToken;
 import com.example.football_api.email.repositories.ConfirmationTokenRepository;
-import com.example.football_api.exceptions.EmailConfirmationException;
-import com.example.football_api.models.User;
-import com.example.football_api.services.AuthService;
-import com.example.football_api.services.UserService;
+import com.example.football_api.exceptions.users.EmailConfirmationException;
+import com.example.football_api.entities.users.User;
+import com.example.football_api.services.users.AuthService;
+import com.example.football_api.services.users.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

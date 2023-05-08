@@ -1,13 +1,13 @@
-package com.example.football_api.services.impl;
+package com.example.football_api.services.users.impl;
 
-import com.example.football_api.models.ERole;
-import com.example.football_api.models.Role;
-import com.example.football_api.models.User;
-import com.example.football_api.payload.response.UserResponse;
-import com.example.football_api.repositories.UserRepository;
+import com.example.football_api.entities.users.ERole;
+import com.example.football_api.entities.users.Role;
+import com.example.football_api.entities.users.User;
+import com.example.football_api.dto.users.response.UserResponse;
+import com.example.football_api.repositories.users.UserRepository;
 import com.example.football_api.security.userDetails.UserDetailsImpl;
-import com.example.football_api.services.RoleService;
-import com.example.football_api.services.mappers.UserMapper;
+import com.example.football_api.services.users.RoleService;
+import com.example.football_api.services.users.mappers.UserMapper;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

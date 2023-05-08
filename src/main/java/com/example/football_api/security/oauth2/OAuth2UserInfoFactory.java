@@ -1,6 +1,6 @@
 package com.example.football_api.security.oauth2;
 
-import com.example.football_api.models.AuthProvider;
+import com.example.football_api.entities.users.AuthProvider;
 
 import java.util.Map;
 
@@ -14,5 +14,5 @@ public class OAuth2UserInfoFactory {
         } else {
             throw new OAuth2AuthenticationProcessingException("Sorry! Login with " + registrationId + " is not supported yet.");
         }
-    }
+    }//
 }

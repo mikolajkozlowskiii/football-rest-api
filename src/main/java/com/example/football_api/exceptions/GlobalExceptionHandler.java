@@ -1,5 +1,10 @@
 package com.example.football_api.exceptions;
 
+import com.example.football_api.exceptions.football.DuplicateLeagueException;
+import com.example.football_api.exceptions.football.LeagueNotFoundException;
+import com.example.football_api.exceptions.users.EmailConfirmationException;
+import com.example.football_api.exceptions.users.JwtTokenException;
+import com.example.football_api.exceptions.users.RoleNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,7 +29,8 @@ public class GlobalExceptionHandler {
 
     @ResponseBody
     @ExceptionHandler({UsernameNotFoundException.class,
-                       RoleNotFoundException.class})
+                       RoleNotFoundException.class,
+                        LeagueNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseStatusException handleUsernameNotFoundException(RuntimeException ex) {
         return new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
@@ -33,7 +39,8 @@ public class GlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler({AppException.class,
                        IllegalStateException.class,
-                       EmailConfirmationException.class})
+                       EmailConfirmationException.class,
+                       DuplicateLeagueException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseStatusException handleAppException(RuntimeException ex) {
         return new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage(), ex);

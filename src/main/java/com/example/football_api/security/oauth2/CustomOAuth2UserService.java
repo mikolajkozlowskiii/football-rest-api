@@ -1,12 +1,12 @@
 package com.example.football_api.security.oauth2;
 
 
-import com.example.football_api.models.AuthProvider;
-import com.example.football_api.models.Role;
-import com.example.football_api.models.User;
-import com.example.football_api.repositories.UserRepository;
+import com.example.football_api.entities.users.AuthProvider;
+import com.example.football_api.entities.users.Role;
+import com.example.football_api.entities.users.User;
+import com.example.football_api.repositories.users.UserRepository;
 import com.example.football_api.security.userDetails.UserDetailsImpl;
-import com.example.football_api.services.RoleService;
+import com.example.football_api.services.users.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -77,8 +77,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         .provider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))
                         .isEnabled(true)
                         .build();
-        //Set<Role> roles = roleService.getRolesForUser();
-        //user.setRoles(roles);
+        Set<Role> roles = roleService.getRolesForUser();
+        user.setRoles(roles);
         return user;
     }
 

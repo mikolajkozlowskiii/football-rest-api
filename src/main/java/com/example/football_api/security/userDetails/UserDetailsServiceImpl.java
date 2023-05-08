@@ -1,7 +1,7 @@
 package com.example.football_api.security.userDetails;
 
-import com.example.football_api.models.User;
-import com.example.football_api.repositories.UserRepository;
+import com.example.football_api.entities.users.User;
+import com.example.football_api.repositories.users.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

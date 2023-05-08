@@ -1,6 +1,6 @@
 package com.example.football_api.email.entity;
 
-import com.example.football_api.models.User;
+import com.example.football_api.entities.users.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,6 +1,6 @@
 package com.example.football_api.security.userDetails;
 
-import com.example.football_api.models.User;
+import com.example.football_api.entities.users.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
