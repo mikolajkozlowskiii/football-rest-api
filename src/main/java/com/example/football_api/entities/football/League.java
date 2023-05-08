@@ -6,7 +6,8 @@ import lombok.*;
 
 import java.util.Set;
 
-
+@NamedEntityGraph(name = "league-teams-graph",
+        attributeNodes = @NamedAttributeNode("teams"))
 @Entity
 @Table(
         name = "leagues",

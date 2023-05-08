@@ -16,12 +16,18 @@ public interface LeagueRepository extends JpaRepository<League, Long> {
     @Query("SELECT l FROM League l LEFT JOIN FETCH l.teams WHERE l.id = (:id)")
     Optional<League> findById(@Param("id") Long id);
     List<League> findByName(String name);
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH,
+            value = "league-teams-graph")
     List<League> findByCountry(String country);
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH,
+            value = "league-teams-graph")
     List<League> findBySeason(String season);
     Optional<League> findByNameAndCountryAndSeason(String name, String country, String season);
     List<League> findByNameAndCountry(String name, String country);
     List<League> findByNameAndSeason(String name, String season);
     List<League> findByCountryAndSeason(String country, String season);
+    @EntityGraph(type = EntityGraph.EntityGraphType.FETCH,
+            value = "league-teams-graph")
     List<League> findAll();
     List<League> findByTeamsContaining(Team team);
     List<League> findByTeamsContains(Team team);
