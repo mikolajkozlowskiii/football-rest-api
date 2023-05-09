@@ -1,11 +1,9 @@
 package com.example.football_api.entities.football;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.util.Set;
 
 @Entity
 @Table(	name = "teams")
