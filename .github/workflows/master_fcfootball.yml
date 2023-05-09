@@ -49,5 +49,5 @@ jobs:
         with:
           app-name: 'fcfootball'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_40244F5AA62D4387B46A5408DD9D0BE5 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E2296FFC69CD4A48888FAFBDA9D9BCAE }}
           package: '*.jar'
