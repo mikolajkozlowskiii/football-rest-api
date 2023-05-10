@@ -12,10 +12,9 @@ import java.util.Set;
 @ToString
 @Getter
 public class LeagueResponse {
-    @JsonIgnore
     private final Long id;
     private final String name;
     private final String season;
     private final String country;
-    private Set<Team> teams;
+    private Set<TeamResponse> teams;
 }

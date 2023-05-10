@@ -27,7 +27,6 @@ public class TestController {
         emailSender.send("mikolajkozlowskiii@gmail.com", "body of email");
         return "email sent";
     }
-// test
     @GetMapping("/user")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public String userAccess() {
@@ -39,7 +38,6 @@ public class TestController {
     public String moderatorAccess() {
         return "Moderator Board.";
     }
-//
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public String adminAccess() {

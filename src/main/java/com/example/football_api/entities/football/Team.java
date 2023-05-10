@@ -4,14 +4,16 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.Set;
+
 
 @Entity
 @Table(	name = "teams")
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString
 public class Team {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,4 +21,6 @@ public class Team {
     @Column(length = 30, nullable = false, unique = true)
     @Size(min = 3, max = 30)
     private String name;
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "teams")
+    private Set<League> leagues;
 }

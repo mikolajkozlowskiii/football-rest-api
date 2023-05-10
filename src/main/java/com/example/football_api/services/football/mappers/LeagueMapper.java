@@ -6,27 +6,43 @@ import com.example.football_api.entities.football.League;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class LeagueMapper {
+    private final TeamMapper teamMapper;
     public League map(LeagueRequest leagueRequest){
         return League.builder()
                 .country(leagueRequest.getCountry())
                 .name(leagueRequest.getName())
                 .season(leagueRequest.getSeason())
+                .teams(
+                        Optional
+                        .ofNullable(leagueRequest.getTeams())
+                        .orElse(Collections.emptySet())
+                        .stream().map(teamMapper::map)
+                        .collect(Collectors.toSet())
+                )
                 .build();
     }
 
     public LeagueResponse map(League league){
-        return LeagueResponse.builder()
+        LeagueResponse leagueResponse = LeagueResponse.builder()
                 .id(league.getId())
                 .country(league.getCountry())
                 .name(league.getName())
                 .season(league.getSeason())
-                .teams(league.getTeams())
+                .teams(Optional
+                        .ofNullable(league.getTeams())
+                        .orElse(Collections.emptySet())
+                        .stream().map(teamMapper::map).collect(Collectors.toSet())
+                )
                 .build();
+        System.out.println(leagueResponse);
+        return leagueResponse;
     }
 
     public League update(League league, LeagueRequest updateInfo){

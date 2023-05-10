@@ -18,11 +18,9 @@ import java.util.Set;
 )
 @Getter
 @Setter
-@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString
 public class League {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +34,7 @@ public class League {
     @Column(length = 3)
     @Size(min = 3, max = 3)
     private String country;
-    @ManyToMany( cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany( fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(
             name = "leagues_teams",
             joinColumns = @JoinColumn(name = "league_id", foreignKey = @ForeignKey(name ="FK_leaguesteams_leagues")),

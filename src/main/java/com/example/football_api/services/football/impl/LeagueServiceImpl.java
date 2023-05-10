@@ -1,23 +1,29 @@
 package com.example.football_api.services.football.impl;
 
 import com.example.football_api.dto.football.request.LeagueRequest;
+import com.example.football_api.dto.football.request.TeamRequest;
 import com.example.football_api.dto.football.response.LeagueResponse;
 import com.example.football_api.entities.football.League;
+import com.example.football_api.entities.football.Team;
 import com.example.football_api.exceptions.football.DuplicateLeagueException;
 import com.example.football_api.exceptions.football.LeagueNotFoundException;
 import com.example.football_api.repositories.football.LeagueRepository;
 import com.example.football_api.services.football.LeagueService;
+import com.example.football_api.services.football.TeamService;
 import com.example.football_api.services.football.mappers.LeagueMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class LeagueServiceImpl implements LeagueService {
     private final LeagueRepository leagueRepository;
     private final LeagueMapper leagueMapper;
+    private final TeamService teamService;
     @Override
     public LeagueResponse save(LeagueRequest leagueRequest) {
         League league = leagueMapper.map(leagueRequest);
@@ -141,6 +147,28 @@ public class LeagueServiceImpl implements LeagueService {
                 .stream()
                 .map(leagueMapper::map)
                 .toList();
+    }
+
+    @Override
+    public LeagueResponse addTeamsToLeague(Long leagueId, List<TeamRequest> teamRequests) {
+        League league = findLeagueById(leagueId);
+        System.out.println("id: "+league.getId());
+        Set<Team> teams = teamRequests.stream().map(teamService::getTeam).collect(Collectors.toSet());
+        teams.forEach(s->league.getTeams().add(s));
+        leagueRepository.save(league);
+        return leagueMapper.map(league);
+    }
+
+    @Override
+    public LeagueResponse addTeamsByIdToLeague(Long leagueId, Set<Long> ids) {
+        League league = findLeagueById(leagueId);
+        Set<Team> teams = ids
+                .stream()
+                .map(teamService::findTeamById)
+                .collect(Collectors.toSet());
+        league.setTeams(teams);
+        leagueRepository.save(league);
+        return leagueMapper.map(league);
     }
 
     private League findLeagueById(Long id) {

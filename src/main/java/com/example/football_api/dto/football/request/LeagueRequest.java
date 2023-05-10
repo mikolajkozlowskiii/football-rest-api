@@ -1,10 +1,13 @@
 package com.example.football_api.dto.football.request;
 
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.util.Set;
 
 @Builder
 @ToString
@@ -16,4 +19,5 @@ public class LeagueRequest {
     private final String season;
     @Size(min = 3, max = 3)
     private final String country;
+    private final Set<TeamRequest> teams;
 }
