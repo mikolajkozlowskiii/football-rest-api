@@ -55,8 +55,21 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Team getTeam(TeamRequest teamRequest) {
+    public Team getTeamEntity(TeamRequest teamRequest) {
+        String teamName = teamRequest.getName();
+        try{
+            return getExistingTeamEntity(teamName);
+        }catch (TeamNotFoundException ex){
+            return getNewTeamEntity(teamRequest);
+        }
+    }
+
+    private Team getNewTeamEntity(TeamRequest teamRequest) {
         return teamMapper.map(teamRequest);
+    }
+
+    private Team getExistingTeamEntity(String teamName) {
+        return findTeamByName(teamName);
     }
 
     @Override
@@ -75,10 +88,10 @@ public class TeamServiceImpl implements TeamService {
         teamRepository.delete(team);
     }
 
-
     @Override
     public List<LeagueResponse> getAllTeamLeagues(Long teamId) {
         Team team = findTeamById(teamId);
+        System.out.println(team.getLeagues().size());
         return team
                 .getLeagues()
                 .stream()

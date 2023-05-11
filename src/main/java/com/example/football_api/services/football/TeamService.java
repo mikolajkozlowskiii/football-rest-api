@@ -13,7 +13,7 @@ public interface TeamService {
     TeamResponse findByName(String name);
     TeamResponse findById(Long id);
     Team findTeamById(Long id);
-    Team getTeam(TeamRequest teamRequest);
+    Team getTeamEntity(TeamRequest teamRequest);
     TeamResponse updateTeam(TeamRequest team);
     TeamResponse deleteTeamById(Long id);
     List<LeagueResponse> getAllTeamLeagues(Long teamId);

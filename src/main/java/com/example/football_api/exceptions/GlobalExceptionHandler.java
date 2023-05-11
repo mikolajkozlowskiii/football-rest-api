@@ -2,6 +2,7 @@ package com.example.football_api.exceptions;
 
 import com.example.football_api.exceptions.football.DuplicateLeagueException;
 import com.example.football_api.exceptions.football.LeagueNotFoundException;
+import com.example.football_api.exceptions.football.TeamNotFoundException;
 import com.example.football_api.exceptions.users.EmailConfirmationException;
 import com.example.football_api.exceptions.users.JwtTokenException;
 import com.example.football_api.exceptions.users.RoleNotFoundException;
@@ -30,7 +31,8 @@ public class GlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler({UsernameNotFoundException.class,
                        RoleNotFoundException.class,
-                        LeagueNotFoundException.class})
+                       LeagueNotFoundException.class,
+                       TeamNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseStatusException handleUsernameNotFoundException(RuntimeException ex) {
         return new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);

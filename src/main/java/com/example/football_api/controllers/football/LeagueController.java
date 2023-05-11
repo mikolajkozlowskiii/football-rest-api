@@ -3,6 +3,7 @@ package com.example.football_api.controllers.football;
 import com.example.football_api.dto.football.request.LeagueRequest;
 import com.example.football_api.dto.football.request.TeamRequest;
 import com.example.football_api.dto.football.response.LeagueResponse;
+import com.example.football_api.exceptions.validators.ValidList;
 import com.example.football_api.services.football.LeagueService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +30,7 @@ public class LeagueController {
 
     @PostMapping
     public ResponseEntity<LeagueResponse> createLeague(@Valid @RequestBody LeagueRequest leagueRequest){
-        System.out.println(leagueRequest);
-        LeagueResponse createdLeague = leagueService.save(leagueRequest);
+        LeagueResponse createdLeague = leagueService.saveNewLeague(leagueRequest);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/leagues/{id}")
                 .buildAndExpand(createdLeague.getId()).toUri();
 
@@ -45,18 +45,32 @@ public class LeagueController {
 
     @PutMapping("/{id}/teams")
     public ResponseEntity<LeagueResponse> addTeams(@PathVariable Long id,
-                                                           @Valid @RequestBody List<TeamRequest> teams){
+                                                   @Valid @RequestBody ValidList<TeamRequest> teams){
+        System.out.println("dzieje sie");
         LeagueResponse leagueResponse = leagueService.addTeamsToLeague(id, teams);
+        return ResponseEntity.ok(leagueResponse);
+    }
+
+    @DeleteMapping("/{id}/teams")
+    public ResponseEntity<LeagueResponse> removeTeams(@PathVariable Long id,
+                                                      @Valid @RequestBody List<TeamRequest> teams){
+        LeagueResponse leagueResponse = leagueService.removeTeamsFromLeague(id, teams);
         return ResponseEntity.ok(leagueResponse);
     }
 
     @PutMapping("/{id}/teams/ids")
     public ResponseEntity<LeagueResponse> addTeamsById(@PathVariable Long id,
-                                                   @Valid @RequestBody Set<Long> teamsId){
-        LeagueResponse leagueResponse = leagueService.addTeamsByIdToLeague(id, teamsId);
+                                                       @Valid @RequestBody Set<Long> teamsId){
+        LeagueResponse leagueResponse = leagueService.addTeamsByIdsToLeague(id, teamsId);
         return ResponseEntity.ok(leagueResponse);
     }
 
+    @DeleteMapping("/{id}/teams/ids")
+    public ResponseEntity<LeagueResponse> removeTeamsById(@PathVariable Long id,
+                                                          @RequestBody Set<Long> teamsId){
+        LeagueResponse leagueResponse = leagueService.removeTeamsByIdsFromLeague(id, teamsId);
+        return ResponseEntity.ok(leagueResponse);
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<LeagueResponse> deleteLeagueById(@PathVariable Long id){

@@ -1,5 +1,7 @@
 package com.example.football_api.dto.football.request;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -9,6 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TeamRequest {
+    @NotBlank
     @Size(min = 3, max = 30)
     private String name;
 }

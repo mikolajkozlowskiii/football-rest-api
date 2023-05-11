@@ -25,26 +25,41 @@ public class LeagueServiceImpl implements LeagueService {
     private final LeagueMapper leagueMapper;
     private final TeamService teamService;
     @Override
-    public LeagueResponse save(LeagueRequest leagueRequest) {
+    public LeagueResponse saveNewLeague(LeagueRequest leagueRequest) {
+        Set<Team> teamsEntities = getTeamsEntities(leagueRequest);
         League league = leagueMapper.map(leagueRequest);
-        saveLeague(league);
+        league.setTeams(teamsEntities);
+        saveNewLeague(league);
         return leagueMapper.map(league);
     }
-    private League saveLeague(League league) {
+
+    private Set<Team> getTeamsEntities(LeagueRequest leagueRequest) {
+        return leagueRequest.getTeams().stream().map(teamService::getTeamEntity).collect(Collectors.toSet());
+    }
+
+    private League saveNewLeague(League league) {
         boolean isLeagueExists = leagueRepository.existsLeagueByNameAndCountryAndSeason(
                 league.getName(), league.getCountry(), league.getSeason()
         );
         if(isLeagueExists){
             throw new DuplicateLeagueException(league);
         }
+        return save(league);
+    }
+
+    private League save(League league){
         return leagueRepository.save(league);
+    }
+
+    private League saveLeagueChanges(League league){
+        return save(league);
     }
 
     @Override
     public LeagueResponse update(Long leagueId, LeagueRequest updateLeagueInfo) {
         League leagueToBeUpdated = findLeagueById(leagueId);
         League updatedLeague = leagueMapper.update(leagueToBeUpdated, updateLeagueInfo);
-        saveLeague(updatedLeague);
+        saveLeagueChanges(updatedLeague);
         return leagueMapper.map(updatedLeague);
     }
 
@@ -152,22 +167,42 @@ public class LeagueServiceImpl implements LeagueService {
     @Override
     public LeagueResponse addTeamsToLeague(Long leagueId, List<TeamRequest> teamRequests) {
         League league = findLeagueById(leagueId);
-        System.out.println("id: "+league.getId());
-        Set<Team> teams = teamRequests.stream().map(teamService::getTeam).collect(Collectors.toSet());
+        Set<Team> teams = teamRequests.stream().map(teamService::getTeamEntity).collect(Collectors.toSet());
         teams.forEach(s->league.getTeams().add(s));
-        leagueRepository.save(league);
+        saveLeagueChanges(league);
         return leagueMapper.map(league);
     }
 
     @Override
-    public LeagueResponse addTeamsByIdToLeague(Long leagueId, Set<Long> ids) {
+    public LeagueResponse addTeamsByIdsToLeague(Long leagueId, Set<Long> ids) {
         League league = findLeagueById(leagueId);
         Set<Team> teams = ids
                 .stream()
                 .map(teamService::findTeamById)
                 .collect(Collectors.toSet());
-        league.setTeams(teams);
-        leagueRepository.save(league);
+        league.getTeams().addAll(teams);
+        saveLeagueChanges(league);
+        return leagueMapper.map(league);
+    }
+
+    @Override
+    public LeagueResponse removeTeamsFromLeague(Long leagueId, List<TeamRequest> teamRequests) {
+        League league = findLeagueById(leagueId);
+        Set<Team> teams = teamRequests.stream().map(teamService::getTeamEntity).collect(Collectors.toSet());
+        teams.forEach(s->league.getTeams().remove(s));
+        saveLeagueChanges(league);
+        return leagueMapper.map(league);
+    }
+
+    @Override
+    public LeagueResponse removeTeamsByIdsFromLeague(Long leagueId, Set<Long> ids) {
+        League league = findLeagueById(leagueId);
+        Set<Team> teams = ids
+                .stream()
+                .map(teamService::findTeamById)
+                .collect(Collectors.toSet());
+        league.getTeams().removeAll(teams);
+        saveLeagueChanges(league);
         return leagueMapper.map(league);
     }
 
