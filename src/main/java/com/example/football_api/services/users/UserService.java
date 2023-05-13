@@ -8,8 +8,8 @@ import com.example.football_api.dto.users.response.UserResponse;
 import com.example.football_api.security.userDetails.UserDetailsImpl;
 
 public interface UserService {
-    UserResponse getCurrentUser(UserDetailsImpl currentUser);
-    UserResponse getUserByEmail(String email);
+    UserResponse findCurrentUserResponse(UserDetailsImpl currentUser);
+    UserResponse findUserResponseByEmail(String email);
     UserResponse updateUser(UpdateUserRequest updatedUser, String username, UserDetailsImpl currentUser);
     boolean deleteUser(String username, UserDetailsImpl currentUser);
     ApiResponse giveModerator(String username);

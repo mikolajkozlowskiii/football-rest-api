@@ -8,6 +8,7 @@ import com.example.football_api.entities.users.User;
 import com.example.football_api.dto.users.request.UpdateUserRequest;
 import com.example.football_api.dto.users.response.ApiResponse;
 import com.example.football_api.dto.users.response.UserResponse;
+import com.example.football_api.exceptions.users.UserNotFoundException;
 import com.example.football_api.repositories.users.UserRepository;
 import com.example.football_api.security.userDetails.UserDetailsImpl;
 import com.example.football_api.services.users.RoleService;
@@ -19,6 +20,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -27,16 +30,19 @@ public class UserServiceImpl implements UserService {
     private final RoleService roleService;
 
     @Override
-    public UserResponse getCurrentUser(UserDetailsImpl userDetails) {
-            return UserResponse.builder()
-                    .firstName(userDetails.getFirstName())
-                    .lastName(userDetails.getLastName())
-                    .email(userDetails.getEmail())
-                    .build();
+    public UserResponse findCurrentUserResponse(UserDetailsImpl userDetails) {
+        if(Objects.isNull(userDetails)){
+            throw new IllegalArgumentException("UserDetails instance can't be null");
+        }
+        return UserResponse.builder()
+                .firstName(userDetails.getFirstName())
+                .lastName(userDetails.getLastName())
+                .email(userDetails.getEmail())
+                .build();
     }
 
     @Override
-    public UserResponse getUserByEmail(String email) {
+    public UserResponse findUserResponseByEmail(String email) {
         return userMapper.map(findUserByEmail(email));
     }
 
@@ -96,13 +102,13 @@ public class UserServiceImpl implements UserService {
     public User findUserByEmail(String email) {
         return userRepository
                 .findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(email));
+                .orElseThrow(() -> new UserNotFoundException(email));
     }
 
     @Override
     public User findUserById(Long id) {
         return userRepository
                 .findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException(String.valueOf(id)));
+                .orElseThrow(() -> new UserNotFoundException(String.valueOf(id)));
     }
 }

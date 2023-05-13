@@ -33,7 +33,7 @@ public class UserController {
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     @ResponseBody
     public ResponseEntity<UserResponse> getCurrentUser(@CurrentUser UserDetailsImpl currentUser){
-        UserResponse userResponse = userService.getCurrentUser(currentUser);
+        UserResponse userResponse = userService.findCurrentUserResponse(currentUser);
         System.out.println(userResponse);
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
@@ -41,7 +41,7 @@ public class UserController {
     @GetMapping("/{email}")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getCurrentUser(@PathVariable(value = "email") String email){
-        UserResponse userResponse = userService.getUserByEmail(email);
+        UserResponse userResponse = userService.findUserResponseByEmail(email);
 
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
@@ -49,8 +49,8 @@ public class UserController {
     @PutMapping("/{email}")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<?> updateUser(@PathVariable(value = "email") String email,
-                                                          @Valid @RequestBody UpdateUserRequest updateUserRequest,
-                                                          @CurrentUser UserDetailsImpl currentUser){
+                                        @Valid @RequestBody UpdateUserRequest updateUserRequest,
+                                        @CurrentUser UserDetailsImpl currentUser){
         if (!Objects.equals(currentUser.getEmail(), email)
                 && !currentUser.getAuthorities().contains(roleService.getRole(ERole.ROLE_ADMIN))) {
             return ResponseEntity
@@ -72,7 +72,7 @@ public class UserController {
     @DeleteMapping("/{email}")
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable(value = "email") String email,
-                                                          @CurrentUser UserDetailsImpl currentUser){
+                                        @CurrentUser UserDetailsImpl currentUser){
         userService.deleteUser(email, currentUser);
 
         return new ResponseEntity<>(new ApiResponse(Boolean.TRUE,
