@@ -13,8 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsByEmail(String email);
     @Transactional
     @Modifying
-    @Query("UPDATE User a " +
-            "SET a.isEnabled = TRUE WHERE a.email = ?1")
+    @Query("UPDATE User a SET a.isEnabled = TRUE WHERE a.email = ?1")
     int enableAppUser(String email);
     @Transactional
     Optional<User> findById(Long id);

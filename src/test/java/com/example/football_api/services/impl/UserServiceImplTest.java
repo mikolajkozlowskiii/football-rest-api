@@ -33,6 +33,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+
 @ExtendWith(MockitoExtension.class)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class UserServiceImplTest {
@@ -46,32 +47,33 @@ class UserServiceImplTest {
     private RoleService roleService;
     private User user;
     private UserDetailsImpl userDetails;
-
     @BeforeEach
     public void setUp() {
-        user = new User();
-        user.setId(1L);
-        user.setFirstName("John");
-        user.setLastName("Doe");
-        user.setEmail("john.doe@example.com");
-        user.setPassword("password");
-        Set<Role> roles = new HashSet<>();
-        roles.add(new Role(ERole.ROLE_USER));
-        user.setRoles(roles);
+        Set<Role> roles = new HashSet<>(Set.of(new Role(ERole.ROLE_USER)));
+        user = User.builder()
+                .id(1L)
+                .firstName("Mikolaj")
+                .lastName("Kozlowski")
+                .email("mikolaj@example.com")
+                .password("passwd")
+                .roles(roles)
+                .isEnabled(true)
+                .provider(AuthProvider.local)
+                .build();
 
         userDetails = UserDetailsImpl.build(user);
     }
 
     @Test
     @DisplayName("getCurrentUser returns UserResponse with correct data")
-    public void findCurrentUser_CurrentUser_ReturnsUserResponse() {
+    public void findCurrentUserResponse_CurrentUser_ReturnsUserResponse() {
         UserResponse expectedResponse = new UserResponse(user.getEmail(), user.getFirstName(),user.getLastName());
         UserResponse actualResponse = userService.findCurrentUserResponse(userDetails);
 
         Assertions.assertEquals(expectedResponse, actualResponse);
     }
     @Test
-    public void findUserByEmail_EmailFounded_ReturnsUserResponse() {
+    public void findUserResponseByEmail_EmailFounded_ReturnsUserResponse() {
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
         when(userMapper.map(user)).thenReturn(new UserResponse(user.getEmail(), user.getFirstName(), user.getLastName()));
 
@@ -104,14 +106,16 @@ class UserServiceImplTest {
 
     @Test
     void findCurrentUser_UserDetailsIsNull_ThrowsIllegalArgumentException() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> userService.findCurrentUserResponse(null));
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> userService.findCurrentUserResponse(null));
     }
 
     @Test
     void updateUser_AccountBelongsToCurrentUser_AccountUpdated() {
-        UpdateUserRequest updateRequest = new UpdateUserRequest();
-        updateRequest.setFirstName("Mikolaj");
-        updateRequest.setLastName("Kozlowski");
+        UpdateUserRequest updateRequest = UpdateUserRequest.builder()
+                .firstName("Mikolaj")
+                .lastName("Kozlowski")
+                .build();
 
         UserResponse expectedUserResponse = UserResponse.builder()
                 .firstName(updateRequest.getFirstName())
