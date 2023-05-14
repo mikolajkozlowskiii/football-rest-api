@@ -15,6 +15,8 @@ import com.example.football_api.services.users.RoleService;
 import com.example.football_api.services.users.UserService;
 import com.example.football_api.services.users.mappers.UserMapper;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,22 +25,19 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserMapper userMapper;
-    private final UserRepository userRepository;
-    private final RoleService roleService;
+    private  UserMapper userMapper;
+    private  UserRepository userRepository;
+    private  RoleService roleService;
 
     @Override
     public UserResponse findCurrentUserResponse(UserDetailsImpl userDetails) {
         if(Objects.isNull(userDetails)){
             throw new IllegalArgumentException("UserDetails instance can't be null");
         }
-        return UserResponse.builder()
-                .firstName(userDetails.getFirstName())
-                .lastName(userDetails.getLastName())
-                .email(userDetails.getEmail())
-                .build();
+        return userMapper.map(userDetails);
     }
 
     @Override
@@ -47,25 +46,39 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse updateUser(UpdateUserRequest updateInfoRequest, String email, UserDetailsImpl currentUser) {
+    public User updateUser(UpdateUserRequest updateInfoRequest, String email, UserDetailsImpl currentUser) {
         User user = findUserByEmail(email);
         if(user.getId().equals(currentUser.getId())){
             User updatedUser = userMapper.map(user, updateInfoRequest);
-            return userMapper.map(userRepository.save(updatedUser));
+            return save(updatedUser);
         }
         throw new UnauthorizedException("Can't update not your account.");
+    }
+
+    @Override
+    public UserResponse getUpdatedUserResponse(UpdateUserRequest updateInfoRequest, String email, UserDetailsImpl currentUser) {
+        User updatedUser = updateUser(updateInfoRequest, email, currentUser);
+        return userMapper.map(updatedUser);
     }
 
     @Override
     @Transactional
     public boolean deleteUser(String email, UserDetailsImpl currentUser) {
         User user = findUserByEmail(email);
-        if(user.getId().equals(currentUser.getId()) ||
-                currentUser.getAuthorities().contains(new SimpleGrantedAuthority(ERole.ROLE_ADMIN.name()))){
-            userRepository.delete(user);
-            return true;
+        checkIfCurrentUserCanDeleteAccount(currentUser, user);
+        delete(user);
+        return true;
+    }
+
+    private static void checkIfCurrentUserCanDeleteAccount(UserDetailsImpl currentUser, User account) {
+        if(!account.getId().equals(currentUser.getId()) &&
+                !currentUser.getAuthorities().contains(new SimpleGrantedAuthority(ERole.ROLE_ADMIN.name()))){
+            throw new UnauthorizedException("Can't delete not your account.");
         }
-        throw new UnauthorizedException("Can't delete not your account.");
+    }
+
+    public void delete(User user) {
+        userRepository.delete(user);
     }
 
     @Override
@@ -76,11 +89,14 @@ public class UserServiceImpl implements UserService {
         if(roleService.checkIfUserHasRole(user, roleModerator)){
             throw new AppException(email + " has already role " + ERole.ROLE_MODERATOR.name());
         }
-
         user.getRoles().add(roleModerator);
-        userRepository.save(user);
+        save(user);
 
         return new ApiResponse(Boolean.TRUE, "Moderator role set to user: " + email);
+    }
+
+    public User save(User user) {
+        return userRepository.save(user);
     }
 
     @Override
@@ -93,7 +109,7 @@ public class UserServiceImpl implements UserService {
         }
 
         user.getRoles().remove(roleModerator);
-        userRepository.save(user);
+        save(user);
 
         return new ApiResponse(Boolean.TRUE, "Moderator role removed from user: " + email);
     }

@@ -5,8 +5,10 @@ import com.example.football_api.entities.users.User;
 import com.example.football_api.dto.users.request.SignUpRequest;
 import com.example.football_api.dto.users.request.UpdateUserRequest;
 import com.example.football_api.dto.users.response.UserResponse;
+import com.example.football_api.security.userDetails.UserDetailsImpl;
 import com.example.football_api.services.users.RoleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -60,5 +62,12 @@ public class UserMapper {
                 .build();
     }
 
+    public UserResponse map(UserDetailsImpl userDetails){
+        return UserResponse.builder()
+                .firstName(userDetails.getFirstName())
+                .lastName(userDetails.getLastName())
+                .email(userDetails.getEmail())
+                .build();
+    }
 
 }

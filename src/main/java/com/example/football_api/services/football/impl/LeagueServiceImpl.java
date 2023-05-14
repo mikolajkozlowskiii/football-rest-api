@@ -14,8 +14,7 @@ import com.example.football_api.services.football.mappers.LeagueMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,7 +33,9 @@ public class LeagueServiceImpl implements LeagueService {
     }
 
     private Set<Team> getTeamsEntities(LeagueRequest leagueRequest) {
-        return leagueRequest.getTeams().stream().map(teamService::getTeamEntity).collect(Collectors.toSet());
+        Set<TeamRequest> teamsRequest = leagueRequest.getTeams();
+        System.out.println(teamsRequest);
+        return Optional.ofNullable(teamsRequest).orElse(Collections.emptySet()).stream().map(teamService::getTeamEntity).collect(Collectors.toSet());
     }
 
     private League saveNewLeague(League league) {

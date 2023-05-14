@@ -10,7 +10,8 @@ import com.example.football_api.security.userDetails.UserDetailsImpl;
 public interface UserService {
     UserResponse findCurrentUserResponse(UserDetailsImpl currentUser);
     UserResponse findUserResponseByEmail(String email);
-    UserResponse updateUser(UpdateUserRequest updatedUser, String username, UserDetailsImpl currentUser);
+    User updateUser(UpdateUserRequest updatedUser, String username, UserDetailsImpl currentUser);
+    UserResponse getUpdatedUserResponse(UpdateUserRequest updateInfoRequest, String email, UserDetailsImpl currentUser);
     boolean deleteUser(String username, UserDetailsImpl currentUser);
     ApiResponse giveModerator(String username);
     ApiResponse removeModerator(String username);

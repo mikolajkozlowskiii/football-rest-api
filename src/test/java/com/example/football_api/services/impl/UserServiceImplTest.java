@@ -21,6 +21,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -30,8 +31,7 @@ import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -68,10 +68,25 @@ class UserServiceImplTest {
     @DisplayName("getCurrentUser returns UserResponse with correct data")
     public void findCurrentUserResponse_CurrentUser_ReturnsUserResponse() {
         UserResponse expectedResponse = new UserResponse(user.getEmail(), user.getFirstName(),user.getLastName());
+
+        when(userMapper.map(userDetails)).thenReturn(
+                UserResponse.builder()
+                .firstName(userDetails.getFirstName())
+                .lastName(userDetails.getLastName())
+                .email(userDetails.getEmail())
+                .build()
+        );
         UserResponse actualResponse = userService.findCurrentUserResponse(userDetails);
 
         Assertions.assertEquals(expectedResponse, actualResponse);
     }
+
+    @Test
+    void findCurrentUser_UserDetailsIsNull_ThrowsIllegalArgumentException() {
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> userService.findCurrentUserResponse(null));
+    }
+
     @Test
     public void findUserResponseByEmail_EmailFounded_ReturnsUserResponse() {
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
@@ -85,29 +100,10 @@ class UserServiceImplTest {
 
     @Test
     public void findUserByEmail_EmailNotFounded_ThrowsUserNotFoundException() {
-        String emailNotFoundInRepo = "Email not founded in repo";
+        String emailNotFoundInRepo = "Email not found in repo";
         when(userRepository.findByEmail(emailNotFoundInRepo)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.findUserResponseByEmail(emailNotFoundInRepo));
-    }
-    @Test
-    void findCurrentUser_UserDetailsValid_ReturnsUserResponse() {
-        UserResponse expectedResponse = UserResponse
-                .builder()
-                .firstName(userDetails.getFirstName())
-                .lastName(userDetails.getLastName())
-                .email(userDetails.getEmail())
-                .build();
-
-        UserResponse acutalResponse = userService.findCurrentUserResponse(userDetails);
-
-        Assertions.assertEquals(expectedResponse, acutalResponse);
-    }
-
-    @Test
-    void findCurrentUser_UserDetailsIsNull_ThrowsIllegalArgumentException() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> userService.findCurrentUserResponse(null));
     }
 
     @Test
@@ -117,7 +113,7 @@ class UserServiceImplTest {
                 .lastName("Kozlowski")
                 .build();
 
-        UserResponse expectedUserResponse = UserResponse.builder()
+        User expectedUpdatedUser = User.builder()
                 .firstName(updateRequest.getFirstName())
                 .lastName(updateRequest.getLastName())
                 .email(user.getEmail())
@@ -132,19 +128,6 @@ class UserServiceImplTest {
                         .email(user.getEmail())
                         .build()
         );
-        when(userMapper.map(
-                User.builder()
-                .firstName(updateRequest.getFirstName())
-                .lastName(updateRequest.getLastName())
-                .email(user.getEmail())
-                .build())
-        ).thenReturn(
-                UserResponse.builder()
-                        .firstName(updateRequest.getFirstName())
-                        .lastName(updateRequest.getLastName())
-                        .email(user.getEmail())
-                        .build()
-        );
 
         when(userRepository.save(any(User.class))).thenReturn(
                 User.builder()
@@ -154,18 +137,24 @@ class UserServiceImplTest {
                 .build()
         );
 
-        UserResponse actualUserResponse = userService.updateUser(updateRequest, userDetails.getEmail(), userDetails);
+        User actualUpdatedUser = userService.updateUser(updateRequest, userDetails.getEmail(), userDetails);
 
-        Assertions.assertEquals(expectedUserResponse, actualUserResponse);
+        Assertions.assertEquals(expectedUpdatedUser, actualUpdatedUser);
+    }
+
+    @Test
+    @Disabled
+    void getUpdatedUserResponse_AccountBelongsToCurrentUser_AccountUpdated() {
     }
 
     @Test
     void updateUser_AccountDoesntBelongToCurrentUser_ThrownUnauthorizedException() {
-        UpdateUserRequest updateRequest = new UpdateUserRequest();
-        updateRequest.setFirstName("Mikolaj");
-        updateRequest.setLastName("Kozlowski");
-        Long diffrentId = user.getId() + 1L;
+        UpdateUserRequest updateRequest = UpdateUserRequest.builder()
+                .firstName("Mikolaj")
+                .lastName("Kozlowski")
+                .build();
 
+        Long diffrentId = user.getId() + 1L;
         User diffrentUser = User.builder()
                 .id(diffrentId)
                 .build();

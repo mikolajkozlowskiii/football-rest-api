@@ -58,7 +58,7 @@ public class UserController {
                     .body(new MessageResponse("Error: Can't update not your account!"));
         }
 
-        UserResponse userResponse = userService.updateUser(updateUserRequest, email, currentUser);
+        UserResponse userResponse = userService.getUpdatedUserResponse(updateUserRequest, email, currentUser);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath()
