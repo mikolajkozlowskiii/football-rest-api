@@ -6,12 +6,13 @@ import com.example.football_api.entities.users.Role;
 import com.example.football_api.entities.users.User;
 import com.example.football_api.exceptions.users.UserNotFoundException;
 import com.example.football_api.repositories.users.UserRepository;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,50 +20,52 @@ import java.util.Optional;
 import java.util.Set;
 
 @DataJpaTest()
+@Sql("/users-schema.sql")
+@Transactional(propagation = Propagation.NEVER)
 public class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
-    private User firstUser;
-    private User secondUser;
-
-    @BeforeEach
-    public void setUp(){
-        firstUser = User.builder()
-                .firstName("Mikolaj")
-                .lastName("Kozlowski")
-                .email("mikolajkozlowskiii@gmail.com")
-                .roles(Set.of(new Role(ERole.ROLE_USER)))
-                .isEnabled(true)
-                .provider(AuthProvider.local)
-                .password("passwd")
-                .build();
-
-        secondUser = User.builder()
-                .firstName("Walter")
-                .lastName("White")
-                .email("breaking@bad.net")
-                .roles(Set.of(new Role(ERole.ROLE_USER)))
-                .isEnabled(true)
-                .provider(AuthProvider.local)
-                .password("passwd")
-                .build();
-    }
-
 
     @Test
+    @Sql(value = "classpath:/delete-users.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void save_UserInstace_UserSaved(){
-        final User user = firstUser;
+        final User user = User.builder()
+                .firstName("Mikolaj")
+                .lastName("Kozlowski")
+                .email("mikolaj@gmail.com")
+                .roles(Set.of(new Role(ERole.ROLE_USER)))
+                .isEnabled(true)
+                .provider(AuthProvider.local)
+                .password("passwd")
+                .build();
 
         final User savedUser = userRepository.save(user);
 
         Assertions.assertNotNull(savedUser);
-        Assertions.assertTrue(savedUser.getId() > 0L);
     }
 
     @Test
+    @Sql(value = "classpath:/delete-users.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void save_ListOfUsers_UsersSaved(){
-        final User firstUser = this.firstUser;
-        final User secondUser = this.secondUser;
+        final User firstUser = User.builder()
+                .firstName("Mikolaj")
+                .lastName("Kozlowski")
+                .email("mikolaj@gmail.com")
+                .isEnabled(true)
+                .roles(Set.of())
+                .provider(AuthProvider.local)
+                .password("passwd")
+                .build();
+
+        final User secondUser = User.builder()
+                .firstName("Gustavo")
+                .lastName("Fring")
+                .email("los@gmail.com")
+                .isEnabled(true)
+                .roles(Set.of())
+                .provider(AuthProvider.local)
+                .password("passwd")
+                .build();
 
         final List<User> expectedUsers = List.of(firstUser, secondUser);
         userRepository.saveAll(new ArrayList<>(expectedUsers));
@@ -73,116 +76,157 @@ public class UserRepositoryTest {
     }
 
     @Test
+    @Sql(value = "classpath:/import-users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "classpath:/delete-users.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void findById_UsersIdBelongsToCurrentUser_UserFound(){
-        final User firstUser = this.firstUser;
-        final User secondUser = this.secondUser;
-        final List<User> expectedUsers = List.of(firstUser, secondUser);
-        userRepository.saveAll(new ArrayList<>(expectedUsers));
+        final User expectedUser = User.builder()
+                .id(1L)
+                .firstName("Mikolaj")
+                .lastName("Kozlowski")
+                .email("mikolajkozlowskiii@gmail.com")
+                .isEnabled(true)
+                .roles(Set.of())
+                .provider(AuthProvider.local)
+                .password("password")
+                .build();
 
-        final Long firstUserId = firstUser.getId();
-        final User actualUser = userRepository
-                .findById(firstUserId)
-                .orElseThrow(() -> new UserNotFoundException(firstUserId.toString()));
+         final User actualUser = userRepository
+                .findById(1L)
+                .orElseThrow(() -> new UserNotFoundException("mikolaj@gmail.com"));
 
-
-        Assertions.assertEquals(firstUser, actualUser);
+        Assertions.assertEquals(expectedUser, actualUser);
     }
 
     @Test
     public void findById_UsersIdDoesntBelongsToAnyUser_ThrownUserNotFound(){
-        final User firstUser = this.firstUser;
-        final User secondUser = this.secondUser;
-        final List<User> expectedUsers = List.of(firstUser, secondUser);
-        userRepository.saveAll(new ArrayList<>(expectedUsers));
-
-        final Long diffrentId = secondUser.getId() + firstUser.getId();
-
         Assertions.assertThrows(UserNotFoundException.class, () -> userRepository
-                .findById(diffrentId)
-                .orElseThrow(() -> new UserNotFoundException(diffrentId.toString())));
+                .findById(100L)
+                .orElseThrow(() -> new UserNotFoundException("mikolaj@gmail.com")));
     }
 
     @Test
+    @Sql(value = "classpath:/import-users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "classpath:/delete-users.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void findByEmail_UsersEmailBelongsToCurrentUser_UserFound(){
-        final User firstUser = this.firstUser;
-        final User secondUser = this.secondUser;
-        final List<User> expectedUsers = List.of(firstUser, secondUser);
-        userRepository.saveAll(new ArrayList<>(expectedUsers));
+        final User expectedUser = User.builder()
+                .id(1L)
+                .firstName("Mikolaj")
+                .lastName("Kozlowski")
+                .email("mikolajkozlowskiii@gmail.com")
+                .isEnabled(true)
+                .roles(Set.of())
+                .provider(AuthProvider.local)
+                .password("password")
+                .build();
 
-        final String firstUserEmail = firstUser.getEmail();
         final User actualUser = userRepository
-                .findByEmail(firstUserEmail)
-                .orElseThrow(() -> new UserNotFoundException(firstUserEmail));
+                .findByEmail("mikolajkozlowskiii@gmail.com")
+                .orElseThrow(() -> new UserNotFoundException("mikolajkozlowskiii@gmail.com"));
 
-
-        Assertions.assertEquals(firstUser, actualUser);
+        Assertions.assertEquals(expectedUser, actualUser);
     }
 
     @Test
     public void findByEmail_UsersEmailDoesntBelongsToAnyUser_ThrownUserNotFound(){
-        final User firstUser = this.firstUser;
-        final User secondUser = this.secondUser;
-        final List<User> expectedUsers = List.of(firstUser, secondUser);
-        userRepository.saveAll(new ArrayList<>(expectedUsers));
-
-        final String diffrentEmail = firstUser.getEmail() + secondUser.getEmail();
-
         Assertions.assertThrows(UserNotFoundException.class, () -> userRepository
-                .findByEmail(diffrentEmail)
-                .orElseThrow(() -> new UserNotFoundException(diffrentEmail)));
+                .findByEmail("email@gmail.com")
+                .orElseThrow(() -> new UserNotFoundException("email@gmail.com")));
     }
 
     @Test
+    @Sql(value = "classpath:/import-users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "classpath:/delete-users.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void existsByEmail_UsersExistsInDB_UserFound(){
-        final User firstUser = this.firstUser;
-        final User secondUser = this.secondUser;
-        final List<User> expectedUsers = List.of(firstUser, secondUser);
-        userRepository.saveAll(new ArrayList<>(expectedUsers));
+        final User existedUserInDB = User.builder()
+                .id(1L)
+                .firstName("Mikolaj")
+                .lastName("Kozlowski")
+                .email("mikolajkozlowskiii@gmail.com")
+                .isEnabled(true)
+                .roles(Set.of())
+                .provider(AuthProvider.local)
+                .password("password")
+                .build();
 
-        final String firstUserEmail = firstUser.getEmail();
-        final boolean actualExists = userRepository.existsByEmail(firstUserEmail);
+        final boolean actualExists = userRepository.existsByEmail("mikolajkozlowskiii@gmail.com");
 
         Assertions.assertTrue(actualExists);
     }
 
     @Test
     public void existsByEmail_UsersDoesntExistsInDB_UserFound(){
-        final User firstUser = this.firstUser;
-        final User secondUser = this.secondUser;
-        final List<User> expectedUsers = List.of(firstUser, secondUser);
-        userRepository.saveAll(new ArrayList<>(expectedUsers));
-
-        final String firstUserEmail = firstUser.getEmail() + secondUser.getEmail();
-        final boolean actualExists = userRepository.existsByEmail(firstUserEmail);
-
+        final boolean actualExists = userRepository.existsByEmail("emailNotInDB@gmail.com");
         Assertions.assertFalse(actualExists);
     }
 
     @Test
+    @Sql(value = "classpath:/import-users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "classpath:/delete-users.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void remove_UserExistsInDB_RemovedUser(){
-        final User firstUser = this.firstUser;
-        final User secondUser = this.secondUser;
-        final List<User> expectedUsers = List.of(firstUser, secondUser);
-        userRepository.saveAll(new ArrayList<>(expectedUsers));
+        final User existedUserInDB = User.builder()
+                .id(1L)
+                .firstName("Mikolaj")
+                .lastName("Kozlowski")
+                .email("mikolajkozlowskiii@gmail.com")
+                .isEnabled(true)
+                .roles(Set.of())
+                .provider(AuthProvider.local)
+                .password("password")
+                .build();
 
-        userRepository.delete(firstUser);
+        userRepository.delete(existedUserInDB);
+
         Optional<User> expectedUser = Optional.empty();
-        Optional<User> actualUser = userRepository.findById(firstUser.getId());
+        Optional<User> actualUser = userRepository.findById(1L);
 
         Assertions.assertEquals(expectedUser, actualUser);
     }
 
     @Test
-    @Disabled("Not implemented yet")
+    @Sql(value = "classpath:/import-users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "classpath:/delete-users.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void enableAppUser_UsersExistsAndDisabled_UserEnabled(){
+         User existedUserInDB = User.builder()
+                .id(2L)
+                .firstName("Walter")
+                .lastName("White")
+                .email("heisenberg@gmail.com")
+                .isEnabled(false)
+                .roles(Set.of())
+                .provider(AuthProvider.local)
+                .password("password")
+                .build();
+
+        userRepository.enableAppUser("heisenberg@gmail.com");
+        User expectedModifiedUser = userRepository
+                .findById(2L)
+                .orElseThrow(() -> new UserNotFoundException("heisenberg@gmail.com"));
+
+        Assertions.assertTrue(expectedModifiedUser.isEnabled());
     }
 
     @Test
-    @Disabled("Not implemented yet")
+    @Sql(value = "classpath:/import-users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(value = "classpath:/delete-users.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     public void enableAppUser_UsersExistsAndEnabled_UserEnabledStill(){
+        User existedUserInDB = User.builder()
+                .id(1L)
+                .firstName("Mikolaj")
+                .lastName("Kozlowski")
+                .email("mikolajkozlowskiii@gmail.com")
+                .isEnabled(true)
+                .roles(Set.of())
+                .provider(AuthProvider.local)
+                .password("password")
+                .build();
+
+        userRepository.enableAppUser("heisenberg@gmail.com");
+        User expectedModifiedUser = userRepository
+                .findById(1L)
+                .orElseThrow(() -> new UserNotFoundException("mikolajkozlowskiii@gmail.com"));
+
+        Assertions.assertTrue(expectedModifiedUser.isEnabled());
     }
-
-
 
 
 }
