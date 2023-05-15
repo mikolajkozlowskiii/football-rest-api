@@ -25,12 +25,11 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 @Service
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private  UserMapper userMapper;
-    private  UserRepository userRepository;
-    private  RoleService roleService;
+    private final UserMapper userMapper;
+    private final UserRepository userRepository;
+    private final RoleService roleService;
 
     @Override
     public UserResponse findCurrentUserResponse(UserDetailsImpl userDetails) {

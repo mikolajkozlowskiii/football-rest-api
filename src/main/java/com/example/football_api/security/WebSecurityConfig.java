@@ -67,6 +67,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(
                         s->s.requestMatchers("/api/v1/auth/**").permitAll()
                                 .requestMatchers("/api/v1/test/**").permitAll()
+                                .requestMatchers("/api/v1/users/**").permitAll()
                                 .requestMatchers("/auth/**", "/oauth2/**").permitAll()
                                 .requestMatchers("api/v1/leagues/**", "api/v1/teams/**").permitAll()
                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**")
