@@ -32,9 +32,7 @@ public class UserController {
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     @ResponseBody
     public ResponseEntity<UserResponse> getCurrentUser(@CurrentUser UserDetailsImpl currentUser){
-        System.out.println("im the danger");
         UserResponse userResponse = userService.findCurrentUserResponse(currentUser);
-        System.out.println(userResponse);
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 

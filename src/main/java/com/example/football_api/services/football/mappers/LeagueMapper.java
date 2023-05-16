@@ -37,7 +37,6 @@ public class LeagueMapper {
                 .country(league.getCountry())
                 .name(league.getName())
                 .season(league.getSeason())
-                .isOfficial(league.isOfficial())
                 .teams(Optional
                         .ofNullable(league.getTeams())
                         .orElse(Collections.emptySet())

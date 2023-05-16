@@ -1,6 +1,7 @@
 package com.example.football_api.entities.users;
 
 
+import com.example.football_api.entities.football.League;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -43,8 +44,11 @@ public class User {
     @NotBlank
     private String firstName;
     private String lastName;
+    @Column(nullable = true)
     private boolean isEnabled;
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
+  //  @OneToMany
+  //  private Set<League> followedLeagues;
    // private List<ConfirmationToken> tokens;
 }

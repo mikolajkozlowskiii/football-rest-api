@@ -26,7 +26,7 @@ public class LeagueController {
 
     @GetMapping("/{id}")
     public ResponseEntity<LeagueResponse> findLeagueById(@PathVariable Long id){
-        return ResponseEntity.ok(leagueService.findById(id));
+        return ResponseEntity.ok(leagueService.findResponseById(id));
     }
 
     @PostMapping

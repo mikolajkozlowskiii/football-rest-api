@@ -20,7 +20,6 @@ import java.util.Optional;
 import java.util.Set;
 
 @DataJpaTest()
-@Sql("/users-schema.sql")
 @Transactional(propagation = Propagation.NEVER)
 public class UserRepositoryTest {
     @Autowired

@@ -5,6 +5,7 @@ import com.example.football_api.dto.football.request.TeamRequest;
 import com.example.football_api.dto.football.response.LeagueResponse;
 import com.example.football_api.entities.football.League;
 import com.example.football_api.entities.football.Team;
+import com.example.football_api.entities.users.ERole;
 import com.example.football_api.exceptions.football.DuplicateLeagueException;
 import com.example.football_api.exceptions.football.LeagueNotFoundException;
 import com.example.football_api.repositories.football.LeagueRepository;
@@ -13,6 +14,7 @@ import com.example.football_api.services.football.LeagueService;
 import com.example.football_api.services.football.TeamService;
 import com.example.football_api.services.football.mappers.LeagueMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -37,7 +39,6 @@ public class LeagueServiceImpl implements LeagueService {
     @Override
     public LeagueResponse setOfficiallLeagueStatus(Long id){
         League league = findLeagueById(id);
-        league.setOfficial(true);
         save(league);
         return leagueMapper.map(league);
     }
@@ -86,7 +87,7 @@ public class LeagueServiceImpl implements LeagueService {
     }
 
     @Override
-    public LeagueResponse findById(Long id) {
+    public LeagueResponse findResponseById(Long id) {
         League league = findLeagueById(id);
         return leagueMapper.map(league);
     }
@@ -234,7 +235,7 @@ public class LeagueServiceImpl implements LeagueService {
         return leagueMapper.map(league);
     }
 
-    private League findLeagueById(Long id) {
+    public League findLeagueById(Long id) {
         return leagueRepository
                 .findById(id)
                 .orElseThrow(() -> new LeagueNotFoundException(id));

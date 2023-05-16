@@ -1,5 +1,6 @@
 package com.example.football_api.entities.football;
 
+import com.example.football_api.entities.users.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -21,9 +22,10 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class League {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(length = 30)
     @Size(min = 3, max = 30)
@@ -41,5 +43,5 @@ public class League {
             inverseJoinColumns = @JoinColumn(name = "team_id", foreignKey = @ForeignKey(name ="FK_leaguesteams_teams"))
     )
     private Set<Team> teams;
-    private boolean isOfficial;
+    //private boolean isOfficial;
 }
