@@ -37,13 +37,13 @@ public class LeagueMapper {
                 .country(league.getCountry())
                 .name(league.getName())
                 .season(league.getSeason())
+                .isOfficial(league.isOfficial())
                 .teams(Optional
                         .ofNullable(league.getTeams())
                         .orElse(Collections.emptySet())
                         .stream().map(teamMapper::map).collect(Collectors.toSet())
                 )
                 .build();
-        System.out.println(leagueResponse);
         return leagueResponse;
     }
 

@@ -8,6 +8,7 @@ import com.example.football_api.services.football.LeagueService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -81,10 +82,19 @@ public class LeagueController {
     public ResponseEntity<List<LeagueResponse>> findLeagueByNameAndCountryAndSeason(
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "season", required = false) String season,
-            @RequestParam(value = "country", required = false) String country
+            @RequestParam(value = "country", required = false) String country,
+            @RequestParam(value = "official", required = false) boolean isOfficial
     ){
-        List<LeagueResponse> leagues = leagueService.searchLeaguesByNameSeasonCountry(name, season, country);
+        List<LeagueResponse> leagues = leagueService.searchLeaguesByNameSeasonCountryOfficial(name, season, country, isOfficial);
 
         return ResponseEntity.ok(leagues);
+    }
+
+    @PutMapping("/{id}/official")
+    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+    public ResponseEntity<LeagueResponse> setOfficialLeagueStatus(@PathVariable Long id){
+        LeagueResponse leagueResponse = leagueService.setOfficiallLeagueStatus(id);
+
+        return ResponseEntity.ok(leagueResponse);
     }
 }

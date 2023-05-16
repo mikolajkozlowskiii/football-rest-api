@@ -1,4 +1,4 @@
-package com.example.football_api.repositories;
+package com.example.football_api.unit.repositories;
 
 import com.example.football_api.entities.users.AuthProvider;
 import com.example.football_api.entities.users.ERole;

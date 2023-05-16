@@ -16,5 +16,6 @@ public class LeagueResponse {
     private final String name;
     private final String season;
     private final String country;
+    private final boolean isOfficial;
     private Set<TeamResponse> teams;
 }

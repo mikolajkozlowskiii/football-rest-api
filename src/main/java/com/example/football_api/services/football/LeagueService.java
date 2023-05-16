@@ -10,9 +10,10 @@ import java.util.Set;
 public interface LeagueService {
     LeagueResponse saveNewLeague(LeagueRequest league);
     LeagueResponse update(Long leagueId, LeagueRequest league);
+    LeagueResponse setOfficiallLeagueStatus(Long id);
     LeagueResponse delete(Long id);
     LeagueResponse findById(Long id);
-    List<LeagueResponse> searchLeaguesByNameSeasonCountry(String name, String season, String country);
+    List<LeagueResponse> searchLeaguesByNameSeasonCountryOfficial(String name, String season, String country, boolean isOfficial);
     List<LeagueResponse> findByName(String name);
     List<LeagueResponse> findByCountry(String country);
     List<LeagueResponse> findBySeason(String season);

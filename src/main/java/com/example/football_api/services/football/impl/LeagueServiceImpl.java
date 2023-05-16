@@ -8,6 +8,7 @@ import com.example.football_api.entities.football.Team;
 import com.example.football_api.exceptions.football.DuplicateLeagueException;
 import com.example.football_api.exceptions.football.LeagueNotFoundException;
 import com.example.football_api.repositories.football.LeagueRepository;
+import com.example.football_api.security.userDetails.UserDetailsImpl;
 import com.example.football_api.services.football.LeagueService;
 import com.example.football_api.services.football.TeamService;
 import com.example.football_api.services.football.mappers.LeagueMapper;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,14 @@ public class LeagueServiceImpl implements LeagueService {
         League league = leagueMapper.map(leagueRequest);
         league.setTeams(teamsEntities);
         saveNewLeague(league);
+        return leagueMapper.map(league);
+    }
+
+    @Override
+    public LeagueResponse setOfficiallLeagueStatus(Long id){
+        League league = findLeagueById(id);
+        league.setOfficial(true);
+        save(league);
         return leagueMapper.map(league);
     }
 
@@ -82,24 +92,41 @@ public class LeagueServiceImpl implements LeagueService {
     }
 
     @Override
-    public List<LeagueResponse> searchLeaguesByNameSeasonCountry(String name, String season, String country) {
+    public List<LeagueResponse> searchLeaguesByNameSeasonCountryOfficial
+            (String name, String season, String country, boolean isOfficial) {
+        List<LeagueResponse> leagueResponses = searchLeaguesByNameSeasonAndCountry(name, season, country);
+
+        return (isOfficial)?
+                leagueResponses
+                        .stream()
+                        .filter(LeagueResponse::isOfficial)
+                        .toList():
+                leagueResponses
+                        .stream()
+                        .filter(s->!s.isOfficial())
+                        .toList();
+    }
+
+    private List<LeagueResponse> searchLeaguesByNameSeasonAndCountry(String name, String season, String country) {
+        List<LeagueResponse> leagueResponses;
         if (name != null && season != null && country != null) {
-            return List.of(findByNameAndSeasonAndCountry(name, season, country));
+            leagueResponses = List.of(findByNameAndSeasonAndCountry(name, season, country));
         } else if (name != null && season != null) {
-            return findByNameAndSeason(name, season);
+            leagueResponses = findByNameAndSeason(name, season);
         } else if (name != null && country != null) {
-            return findByNameAndCountry(name, country);
+            leagueResponses = findByNameAndCountry(name, country);
         } else if (season != null && country != null) {
-             return findBySeasonAndCountry(season, country);
+            leagueResponses = findBySeasonAndCountry(season, country);
         } else if (name != null) {
-            return findByName(name);
+            leagueResponses = findByName(name);
         } else if (season != null) {
-            return findBySeason(season);
+            leagueResponses = findBySeason(season);
         } else if (country != null) {
-            return findByCountry(country);
+            leagueResponses = findByCountry(country);
         } else {
-            return findAll();
+            leagueResponses = findAll();
         }
+        return leagueResponses;
     }
 
     private List<LeagueResponse> findAll() {
