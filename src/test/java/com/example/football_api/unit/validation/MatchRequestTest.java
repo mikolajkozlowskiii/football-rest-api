@@ -1,6 +1,6 @@
 package com.example.football_api.unit.validation;
 
-import com.example.football_api.dto.football.validation.MatchRequest;
+import com.example.football_api.dto.football.request.MatchRequest;
 import jakarta.validation.ConstraintViolation;
 
 import jakarta.validation.Validator;

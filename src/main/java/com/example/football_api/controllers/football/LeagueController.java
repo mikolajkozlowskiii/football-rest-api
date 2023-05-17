@@ -1,7 +1,7 @@
 package com.example.football_api.controllers.football;
 
-import com.example.football_api.dto.football.validation.LeagueRequest;
-import com.example.football_api.dto.football.validation.TeamRequest;
+import com.example.football_api.dto.football.request.LeagueRequest;
+import com.example.football_api.dto.football.request.TeamRequest;
 import com.example.football_api.dto.football.response.LeagueResponse;
 import com.example.football_api.exceptions.validators.ValidList;
 import com.example.football_api.services.football.LeagueService;
@@ -90,11 +90,4 @@ public class LeagueController {
         return ResponseEntity.ok(leagues);
     }
 
-    @PutMapping("/{id}/official")
-    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
-    public ResponseEntity<LeagueResponse> setOfficialLeagueStatus(@PathVariable Long id){
-        LeagueResponse leagueResponse = leagueService.setOfficiallLeagueStatus(id);
-
-        return ResponseEntity.ok(leagueResponse);
-    }
 }

@@ -1,6 +1,6 @@
 package com.example.football_api.services.football.mappers;
 
-import com.example.football_api.dto.football.validation.LeagueRequest;
+import com.example.football_api.dto.football.request.LeagueRequest;
 import com.example.football_api.dto.football.response.LeagueResponse;
 import com.example.football_api.entities.football.League;
 import lombok.RequiredArgsConstructor;

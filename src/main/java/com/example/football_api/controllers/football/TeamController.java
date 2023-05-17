@@ -1,6 +1,6 @@
 package com.example.football_api.controllers.football;
 
-import com.example.football_api.dto.football.validation.TeamRequest;
+import com.example.football_api.dto.football.request.TeamRequest;
 import com.example.football_api.dto.football.response.LeagueResponse;
 import com.example.football_api.dto.football.response.TeamResponse;
 import com.example.football_api.services.football.TeamService;

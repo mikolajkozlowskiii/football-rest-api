@@ -1,7 +1,7 @@
 package com.example.football_api.services.football;
 
-import com.example.football_api.dto.football.validation.LeagueRequest;
-import com.example.football_api.dto.football.validation.TeamRequest;
+import com.example.football_api.dto.football.request.LeagueRequest;
+import com.example.football_api.dto.football.request.TeamRequest;
 import com.example.football_api.dto.football.response.LeagueResponse;
 import com.example.football_api.entities.football.League;
 
@@ -11,7 +11,6 @@ import java.util.Set;
 public interface LeagueService {
     LeagueResponse saveNewLeague(LeagueRequest league);
     LeagueResponse update(Long leagueId, LeagueRequest league);
-    LeagueResponse setOfficiallLeagueStatus(Long id);
     LeagueResponse delete(Long id);
     LeagueResponse findResponseById(Long id);
     League findLeagueById(Long id);

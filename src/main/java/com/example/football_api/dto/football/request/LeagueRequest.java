@@ -1,4 +1,4 @@
-package com.example.football_api.dto.football.validation;
+package com.example.football_api.dto.football.request;
 
 
 import jakarta.validation.constraints.NotBlank;

@@ -43,5 +43,4 @@ public class League {
             inverseJoinColumns = @JoinColumn(name = "team_id", foreignKey = @ForeignKey(name ="FK_leaguesteams_teams"))
     )
     private Set<Team> teams;
-    //private boolean isOfficial;
 }

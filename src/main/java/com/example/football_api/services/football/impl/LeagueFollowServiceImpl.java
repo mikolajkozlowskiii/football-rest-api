@@ -44,9 +44,6 @@ public class LeagueFollowServiceImpl implements LeagueFollowService {
 
     @Override
     public void unFollowLeague(Long leagueId, Long userId) {
-        //LeagueFollow leagueFollow = getFollowLeagueEntity(leagueId, userId);
-        System.out.println("123");
         leagueFollowRepository.deleteByLeagueId(leagueId);
-        System.out.println("1234");
     }
 }

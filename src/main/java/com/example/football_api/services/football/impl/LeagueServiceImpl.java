@@ -1,7 +1,7 @@
 package com.example.football_api.services.football.impl;
 
-import com.example.football_api.dto.football.validation.LeagueRequest;
-import com.example.football_api.dto.football.validation.TeamRequest;
+import com.example.football_api.dto.football.request.LeagueRequest;
+import com.example.football_api.dto.football.request.TeamRequest;
 import com.example.football_api.dto.football.response.LeagueResponse;
 import com.example.football_api.entities.football.League;
 import com.example.football_api.entities.football.Team;
@@ -32,12 +32,6 @@ public class LeagueServiceImpl implements LeagueService {
         return leagueMapper.map(league);
     }
 
-    @Override
-    public LeagueResponse setOfficiallLeagueStatus(Long id){
-        League league = findLeagueById(id);
-        save(league);
-        return leagueMapper.map(league);
-    }
 
     private Set<Team> getTeamsEntities(LeagueRequest leagueRequest) {
         Set<TeamRequest> teamsRequest = leagueRequest.getTeams();
