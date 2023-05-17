@@ -1,6 +1,5 @@
-package com.example.football_api.dto.football.request;
+package com.example.football_api.dto.football.validation;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;

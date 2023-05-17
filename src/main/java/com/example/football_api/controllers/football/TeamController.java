@@ -1,12 +1,10 @@
 package com.example.football_api.controllers.football;
 
-import com.example.football_api.dto.football.request.TeamRequest;
+import com.example.football_api.dto.football.validation.TeamRequest;
 import com.example.football_api.dto.football.response.LeagueResponse;
 import com.example.football_api.dto.football.response.TeamResponse;
-import com.example.football_api.entities.football.Team;
 import com.example.football_api.services.football.TeamService;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,25 +1,21 @@
 package com.example.football_api.services.football.impl;
 
-import com.example.football_api.dto.football.request.LeagueRequest;
-import com.example.football_api.dto.football.request.TeamRequest;
+import com.example.football_api.dto.football.validation.LeagueRequest;
+import com.example.football_api.dto.football.validation.TeamRequest;
 import com.example.football_api.dto.football.response.LeagueResponse;
 import com.example.football_api.entities.football.League;
 import com.example.football_api.entities.football.Team;
-import com.example.football_api.entities.users.ERole;
 import com.example.football_api.exceptions.football.DuplicateLeagueException;
 import com.example.football_api.exceptions.football.LeagueNotFoundException;
 import com.example.football_api.repositories.football.LeagueRepository;
-import com.example.football_api.security.userDetails.UserDetailsImpl;
 import com.example.football_api.services.football.LeagueService;
 import com.example.football_api.services.football.TeamService;
 import com.example.football_api.services.football.mappers.LeagueMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
