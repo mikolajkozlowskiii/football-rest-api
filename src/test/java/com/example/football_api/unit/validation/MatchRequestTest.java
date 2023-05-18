@@ -8,7 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Set;
 
 import static jakarta.validation.Validation.buildDefaultValidatorFactory;
@@ -25,7 +27,8 @@ class MatchRequestTest {
         MatchRequest notValidMatchRequest = MatchRequest.builder()
                 .awayTeamId(1L)
                 .homeTeamId(1L)
-                .dateTime(LocalDateTime.of(2023, 5, 17, 11, 50))
+                .date(LocalDate.of(2023, 5, 18))
+                .time(LocalTime.of(21, 30))
                 .leagueId(5L)
                 .build();
 
@@ -34,14 +37,15 @@ class MatchRequestTest {
         assertEquals(1, violations.size());
         ConstraintViolation<MatchRequest> violation = violations.iterator().next();
         assertEquals("homeTeamId can't be equal as awayTeamId", violation.getMessage());
-        assertEquals("ValidateMatchTeams", violation.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName());
+        assertEquals("MatchConstraints", violation.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName());
     }
     @Test
     public void validateMatchRequest_AwayTeamNotEqualsHomeTeam_NoViolation(){
         MatchRequest notValidMatchRequest = MatchRequest.builder()
                 .awayTeamId(1L)
                 .homeTeamId(2L)
-                .dateTime(LocalDateTime.of(2023, 5, 17, 11, 50))
+                .date(LocalDate.of(2023, 5, 18))
+                .time(LocalTime.of(21, 30))
                 .leagueId(5L)
                 .build();
 
@@ -54,7 +58,8 @@ class MatchRequestTest {
         MatchRequest notValidMatchRequest = MatchRequest.builder()
                 .awayTeamId(null)
                 .homeTeamId(1L)
-                .dateTime(LocalDateTime.of(2023, 5, 17, 11, 50))
+                .date(LocalDate.of(2023, 5, 18))
+                .time(LocalTime.of(21, 30))
                 .leagueId(5L)
                 .build();
 
@@ -70,7 +75,8 @@ class MatchRequestTest {
         MatchRequest notValidMatchRequest = MatchRequest.builder()
                 .awayTeamId(1L)
                 .homeTeamId(null)
-                .dateTime(LocalDateTime.of(2023, 5, 17, 11, 50))
+                .date(LocalDate.of(2023, 5, 18))
+                .time(LocalTime.of(21, 30))
                 .leagueId(5L)
                 .build();
 
@@ -86,7 +92,8 @@ class MatchRequestTest {
         MatchRequest notValidMatchRequest = MatchRequest.builder()
                 .awayTeamId(null)
                 .homeTeamId(null)
-                .dateTime(LocalDateTime.of(2023, 5, 17, 11, 50))
+                .date(LocalDate.of(2023, 5, 18))
+                .time(LocalTime.of(21, 30))
                 .leagueId(5L)
                 .build();
 
@@ -102,7 +109,8 @@ class MatchRequestTest {
         MatchRequest notValidMatchRequest = MatchRequest.builder()
                 .awayTeamId(1L)
                 .homeTeamId(2L)
-                .dateTime(LocalDateTime.of(2023, 5, 17, 11, 50))
+                .date(LocalDate.of(2023, 5, 18))
+                .time(LocalTime.of(21, 30))
                 .leagueId(null)
                 .build();
 
@@ -118,7 +126,8 @@ class MatchRequestTest {
         MatchRequest notValidMatchRequest = MatchRequest.builder()
                 .awayTeamId(1L)
                 .homeTeamId(2L)
-                .dateTime(null)
+                .date(null)
+                .time(null)
                 .leagueId(5L)
                 .build();
 
@@ -134,7 +143,8 @@ class MatchRequestTest {
         MatchRequest notValidMatchRequest = MatchRequest.builder()
                 .awayTeamId(null)
                 .homeTeamId(null)
-                .dateTime(null)
+                .date(null)
+                .time(null)
                 .leagueId(null)
                 .build();
 

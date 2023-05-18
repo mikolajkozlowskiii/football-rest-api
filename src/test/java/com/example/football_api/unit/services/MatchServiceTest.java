@@ -23,7 +23,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -47,7 +49,8 @@ public class MatchServiceTest {
                 .leagueId(1L)
                 .homeTeamScore(3)
                 .awayTeamScore(0)
-                .dateTime(LocalDateTime.of(2023, 5, 18, 21, 30))
+                .date(LocalDate.of(2023, 5, 18))
+                .time(LocalTime.of(21, 30))
                 .build();
 
         Match match = Match.builder()
@@ -56,7 +59,8 @@ public class MatchServiceTest {
                 .league(League.builder().id(1L).build())
                 .homeTeamScore(3)
                 .awayTeamScore(0)
-                .dateTime(LocalDateTime.of(2023, 5, 18, 21, 30))
+                .date(LocalDate.of(2023, 5, 18))
+                .time(LocalTime.of(21, 30))
                 .build();
 
         when(teamService.isTeamInLeague(anyLong(), anyLong())).thenReturn(true);
@@ -76,7 +80,8 @@ public class MatchServiceTest {
                 .leagueId(1L)
                 .homeTeamScore(3)
                 .awayTeamScore(0)
-                .dateTime(LocalDateTime.of(2023, 5, 18, 21, 30))
+                .date(LocalDate.of(2023, 5, 18))
+                .time(LocalTime.of(21, 30))
                 .build();
 
         when(teamService.isTeamInLeague(anyLong(), anyLong())).thenReturn(false);
@@ -93,7 +98,8 @@ public class MatchServiceTest {
                 .league(League.builder().id(1L).build())
                 .homeTeamScore(3)
                 .awayTeamScore(0)
-                .dateTime(LocalDateTime.of(2023, 5, 18, 21, 30))
+                .date(LocalDate.of(2023, 5, 18))
+                .time(LocalTime.of(21, 30))
                 .build();
 
        // when(matchRepository.findAll(any(PageRequest.of(0,10, Sort.by("leagueId"))))).thenReturn(Page.of)
