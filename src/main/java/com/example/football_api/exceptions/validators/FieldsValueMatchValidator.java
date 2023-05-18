@@ -7,13 +7,13 @@ import org.springframework.beans.BeanWrapperImpl;
 import java.util.Objects;
 
 public class FieldsValueMatchValidator
-        implements ConstraintValidator<ValidateMatchTeams, Object> {
+        implements ConstraintValidator<MatchConstraints, Object> {
 
     private String homeTeam;
     private String awayTeam;
 
     @Override
-    public void initialize(ValidateMatchTeams constraintAnnotation) {
+    public void initialize(MatchConstraints constraintAnnotation) {
         this.homeTeam = constraintAnnotation.homeTeam();
         this.awayTeam = constraintAnnotation.awayTeam();
     }

@@ -98,4 +98,10 @@ public class TeamServiceImpl implements TeamService {
                 .map(leagueMapper::map)
                 .toList();
     }
+
+    @Override
+    public boolean isTeamInLeague(Long teamId, Long leagueId) {
+        List<LeagueResponse> allTeamLeagues = getAllTeamLeagues(teamId);
+        return allTeamLeagues.stream().filter(s->s.getId().equals(leagueId)).toList().size()>0;
+    }
 }

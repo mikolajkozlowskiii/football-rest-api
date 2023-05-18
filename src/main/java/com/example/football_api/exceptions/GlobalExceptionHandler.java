@@ -1,6 +1,7 @@
 package com.example.football_api.exceptions;
 
 import com.example.football_api.exceptions.football.DuplicateLeagueException;
+import com.example.football_api.exceptions.football.LeagueNotContainTeamException;
 import com.example.football_api.exceptions.football.LeagueNotFoundException;
 import com.example.football_api.exceptions.football.TeamNotFoundException;
 import com.example.football_api.exceptions.users.EmailConfirmationException;
@@ -42,10 +43,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({AppException.class,
                        IllegalStateException.class,
                        EmailConfirmationException.class,
-                       DuplicateLeagueException.class})
+                       DuplicateLeagueException.class,
+                       LeagueNotContainTeamException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseStatusException handleAppException(RuntimeException ex) {
         return new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage(), ex);
+    }
+
+    @ResponseBody
+    @ExceptionHandler({SortByException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseStatusException handleBadRequestAppException(RuntimeException ex) {
+        return new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
     }
 
     @ResponseBody

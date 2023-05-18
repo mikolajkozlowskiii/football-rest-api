@@ -17,4 +17,5 @@ public interface TeamService {
     TeamResponse updateTeam(TeamRequest team);
     TeamResponse deleteTeamById(Long id);
     List<LeagueResponse> getAllTeamLeagues(Long teamId);
+    boolean isTeamInLeague(Long teamId, Long leagueId);
 }

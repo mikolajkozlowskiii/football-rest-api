@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = FieldsValueMatchValidator.class)
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidateMatchTeams {
+public @interface MatchConstraints {
 
     String message() default "HomeTeam can't be equal as awayTeam";
 
@@ -24,6 +24,6 @@ public @interface ValidateMatchTeams {
     @Target({ ElementType.TYPE })
     @Retention(RetentionPolicy.RUNTIME)
     @interface List {
-        ValidateMatchTeams[] value();
+        MatchConstraints[] value();
     }
 }
