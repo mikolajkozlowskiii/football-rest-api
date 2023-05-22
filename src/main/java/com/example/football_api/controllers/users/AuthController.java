@@ -9,6 +9,7 @@ import com.example.football_api.dto.users.response.JwtResponse;
 import com.example.football_api.dto.users.response.MessageResponse;
 import com.example.football_api.services.users.AuthService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,15 +18,12 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
-
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/auth")
+@RequiredArgsConstructor
 public class AuthController {
-    @Autowired
-    AuthService authService;
-    @Autowired
-    private ConfirmationTokenServiceImpl confirmationTokenService;
+    private final AuthService authService;
+    private final ConfirmationTokenServiceImpl confirmationTokenService;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {

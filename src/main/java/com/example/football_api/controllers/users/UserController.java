@@ -7,7 +7,6 @@ import com.example.football_api.dto.users.response.MessageResponse;
 import com.example.football_api.dto.users.response.UserResponse;
 import com.example.football_api.security.userDetails.CurrentUser;
 import com.example.football_api.security.userDetails.UserDetailsImpl;
-import com.example.football_api.services.users.AuthService;
 import com.example.football_api.services.users.RoleService;
 import com.example.football_api.services.users.UserService;
 import jakarta.validation.Valid;

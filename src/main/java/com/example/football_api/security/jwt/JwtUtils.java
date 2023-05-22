@@ -31,6 +31,15 @@ public class JwtUtils {
                 .compact();
     }
 
+    public String generateJwtTokenFromId(Long id) {
+        return Jwts.builder()
+                .setSubject((id.toString()))
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationTimeInMs))
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .compact();
+    }
+
     public Long getUserIdFromJwtToken(String token) {
         return Long.valueOf(Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject());
     }
