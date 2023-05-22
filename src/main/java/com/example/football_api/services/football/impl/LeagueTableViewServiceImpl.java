@@ -13,8 +13,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LeagueTableViewServiceImpl implements LeagueTableViewService {
     private final LeagueTableViewRepository leagueTableViewRepository;
+    private final LeagueService leagueService;
     @Override
     public List<LeagueTableView> getLeagueTableViewByLeagueId(Long leagueId) {
+        leagueService.findLeagueById(leagueId);
         return leagueTableViewRepository.findByLeagueId(leagueId);
     }
 }

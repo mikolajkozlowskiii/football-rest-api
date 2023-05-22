@@ -30,6 +30,7 @@ public class FieldsValueMatchValidator
     }
 
     public boolean checkUnique(Object obj1, Object obj2){
+        // TODO throw DuplicateTeamException
         if(obj1 == null || obj2 == null){
             return true;
         }
