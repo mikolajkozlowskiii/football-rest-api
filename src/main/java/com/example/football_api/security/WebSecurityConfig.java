@@ -64,11 +64,12 @@ public class WebSecurityConfig {
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeHttpRequests(
+                .authorizeHttpRequests( // TODO refactor requestMatchers
                         s->s.requestMatchers("/api/v1/auth/**").permitAll()
                                 .requestMatchers("/api/v1/test/**").permitAll()
                                 .requestMatchers("/api/v1/users/**").permitAll()
                                 .requestMatchers("/api/v1/matches/**").permitAll()
+                                .requestMatchers("/api/v1/players/**").permitAll()
                                 .requestMatchers("/api/v1/leagues-view/**").permitAll()
                                 .requestMatchers("/api/v1/followed-leagues/**").permitAll()
                                 .requestMatchers("/auth/**", "/oauth2/**").permitAll()

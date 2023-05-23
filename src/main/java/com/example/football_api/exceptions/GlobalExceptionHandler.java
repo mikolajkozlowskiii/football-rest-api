@@ -30,7 +30,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({UsernameNotFoundException.class,
                        RoleNotFoundException.class,
                        LeagueNotFoundException.class,
-                       TeamNotFoundException.class})
+                       TeamNotFoundException.class,
+                       PlayerNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseStatusException handleUsernameNotFoundException(RuntimeException ex) {
         return new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage(), ex);
