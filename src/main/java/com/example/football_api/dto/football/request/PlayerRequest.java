@@ -17,8 +17,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class PlayerRequest {
-    @NotNull
-    private Long teamId;
+    private PlayerTeamHistoryRequest playerTeamHistoryRequest;
     @NotBlank
     @Size(min = 2, max = 30)
     private String firstName;

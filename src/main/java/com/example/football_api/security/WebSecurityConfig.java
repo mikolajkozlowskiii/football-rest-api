@@ -70,6 +70,7 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/v1/users/**").permitAll()
                                 .requestMatchers("/api/v1/matches/**").permitAll()
                                 .requestMatchers("/api/v1/players/**").permitAll()
+                                .requestMatchers("/api/v1/goals/**").permitAll()
                                 .requestMatchers("/api/v1/leagues-view/**").permitAll()
                                 .requestMatchers("/api/v1/followed-leagues/**").permitAll()
                                 .requestMatchers("/auth/**", "/oauth2/**").permitAll()

@@ -2,6 +2,7 @@ package com.example.football_api.dto.football.request;
 
 
 import com.example.football_api.exceptions.validators.MatchConstraints;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,7 +29,9 @@ public class MatchRequest {
     private Long awayTeamId;
     @NotNull
     private Long leagueId;
+    @Min(value = 0)
     private int homeTeamScore;
+    @Min(value = 0)
     private int awayTeamScore;
     @NotNull
     private LocalDate date;

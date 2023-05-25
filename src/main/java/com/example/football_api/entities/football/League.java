@@ -22,7 +22,6 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString
 public class League {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

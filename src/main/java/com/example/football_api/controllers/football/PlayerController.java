@@ -24,14 +24,14 @@ public class PlayerController {
         return ResponseEntity.ok(playerService.findPlayerResponseById(id));
     }
 
-    @GetMapping("/team/{teamId}")
+    @GetMapping("/teams/{teamId}")
     public ResponseEntity<List<PlayerResponse>> getPlayersByTeamId(@PathVariable  Long teamId){
         return ResponseEntity.ok(playerService.findByTeamIdPlayerResponses(teamId));
     }
 
     @PostMapping
     public ResponseEntity<PlayerResponse> savePlayer(@RequestBody @Valid PlayerRequest playerRequest){
-        PlayerResponse createdPlayer = playerService.save(playerRequest);
+        PlayerResponse createdPlayer = playerService.create(playerRequest);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/players/{id}")
                 .buildAndExpand(createdPlayer.getId()).toUri();
 

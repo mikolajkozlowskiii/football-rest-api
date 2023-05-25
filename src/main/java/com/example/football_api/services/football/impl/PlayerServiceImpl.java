@@ -1,11 +1,14 @@
 package com.example.football_api.services.football.impl;
 
 import com.example.football_api.dto.football.request.PlayerRequest;
+import com.example.football_api.dto.football.request.PlayerTeamHistoryRequest;
 import com.example.football_api.dto.football.response.PlayerResponse;
 import com.example.football_api.entities.football.Player;
+import com.example.football_api.entities.football.PlayerTeamHistory;
 import com.example.football_api.entities.football.Team;
 import com.example.football_api.exceptions.football.PlayerNotFoundException;
 import com.example.football_api.repositories.football.PlayerRepository;
+import com.example.football_api.services.football.PlayerTeamHistoryService;
 import com.example.football_api.services.football.PlayerService;
 import com.example.football_api.services.football.TeamService;
 import com.example.football_api.services.football.mappers.PlayerMapper;
@@ -13,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -20,12 +25,14 @@ public class PlayerServiceImpl implements PlayerService {
     private final PlayerRepository playerRepository;
     private final TeamService teamService;
     private final PlayerMapper playerMapper;
+    private final PlayerTeamHistoryService playerTeamHistoryService;
     @Override
     public PlayerResponse findPlayerResponseById(Long id) {
-        return playerMapper.map(findById(id));
+        return playerMapper.map(findPlayerById(id));
     }
 
-    private Player findById(Long id){
+    @Override
+    public Player findPlayerById(Long id) {
         return playerRepository
                 .findById(id)
                 .orElseThrow(() -> new PlayerNotFoundException(id));
@@ -34,52 +41,54 @@ public class PlayerServiceImpl implements PlayerService {
     @Override
     public List<PlayerResponse> findByTeamIdPlayerResponses(Long teamId) {
         Team team = teamService.findTeamById(teamId);
-        List<Player> players = playerRepository.findByTeam(team);
+        List<Player> players = playerRepository.findAllCurrentPlayersInTeam(team);
         return players.stream().map(playerMapper::map).toList();
     }
 
-    @Override
-    public PlayerResponse save(PlayerRequest playerRequest) {
-        Team team = teamService.findTeamById(playerRequest.getTeamId());
-        Player player = playerMapper.map(playerRequest, team);
-        return playerMapper.map(save(player));
-    }
     private Player save(Player player){
         return playerRepository.save(player);
     }
 
     @Override
+    public PlayerResponse create(PlayerRequest playerRequest) {
+        Player player = playerMapper.map(playerRequest);
+        save(player);
+        System.out.println(playerMapper.map(player));
+        // TODO change Set to just PlayerTeamHistory, should work and also change getTeams.add()
+        if(Objects.isNull(playerRequest.getPlayerTeamHistoryRequest())){
+            return playerMapper.map(player);
+        }
+        Set<PlayerTeamHistory> teams = playerTeamHistoryService.getNewPlayerTeamHistories(playerRequest.getPlayerTeamHistoryRequest(), player);
+        player.getTeams().addAll(teams);
+        System.out.println(playerMapper.map(player));
+        return playerMapper.map(save(player));
+    }
+
+    @Override
+    public PlayerResponse updatePlayer(Long playerId, PlayerRequest playerRequest) {
+        Player player = findPlayerById(playerId);
+        Player updatedPlayer = playerMapper.map(playerRequest);
+        updatedPlayer.setId(player.getId());
+        updatedPlayer.setTeams(player.getTeams());
+        save(updatedPlayer);
+        // TODO change Set to just PlayerTeamHistory, should work and also change getTeams.add()
+        if(Objects.isNull(playerRequest.getPlayerTeamHistoryRequest())){
+            return playerMapper.map(updatedPlayer);
+        }
+        Set<PlayerTeamHistory> teams = playerTeamHistoryService.getUpdatedPlayerTeamHistories(playerId, playerRequest.getPlayerTeamHistoryRequest(), updatedPlayer);
+        updatedPlayer.getTeams().addAll(teams);
+        System.out.println(updatedPlayer.getTeams());
+        return playerMapper.map(save(updatedPlayer));
+    }
+
+    @Override
     public PlayerResponse deletePlayer(Long playerId) {
-        Player player = findById(playerId);
+        Player player = findPlayerById(playerId);
         delete(player);
         return playerMapper.map(player);
     }
 
     private void delete(Player player){
         playerRepository.delete(player);
-    }
-
-    @Override
-    public PlayerResponse updatePlayer(Long playerId, PlayerRequest playerRequest) {
-        Player player = findById(playerId);
-        Team team = teamService.findTeamById(playerRequest.getTeamId());
-        Player updatedPlayer = getUpdatedPlayer(playerRequest, player, team);
-        save(updatedPlayer);
-        return playerMapper.map(updatedPlayer);
-    }
-
-    private static Player getUpdatedPlayer(PlayerRequest playerRequest, Player player, Team team) {
-        Player updatedPlayer = Player.builder()
-                .id(player.getId())
-                .firstName(playerRequest.getFirstName())
-                .lastName(playerRequest.getLastName())
-                .weight(playerRequest.getWeight())
-                .height(playerRequest.getHeight())
-                .strongerFeet(playerRequest.isStrongerFeet())
-                .position(playerRequest.getPosition())
-                .birthDate(playerRequest.getBirthDate())
-                .team(team)
-                .build();
-        return updatedPlayer;
     }
 }

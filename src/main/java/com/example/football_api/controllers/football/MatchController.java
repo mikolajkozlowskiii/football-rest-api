@@ -27,7 +27,7 @@ public class MatchController {
 
     @GetMapping("/{id}")
     public ResponseEntity<MatchResponse> findMatchById(@PathVariable Long id){
-        return ResponseEntity.ok(matchService.findById(id));
+        return ResponseEntity.ok(matchService.findMatchResponseById(id));
     }
 
     @GetMapping("/league/{leagueId}/team/{teamId}")

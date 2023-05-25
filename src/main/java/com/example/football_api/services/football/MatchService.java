@@ -16,7 +16,8 @@ public interface MatchService {
      List<MatchResponse> findByLeagueIdAndTeamId(Long leagueId, Long teamId);
      List<MatchResponse> findAllByDateToday();
      List<MatchResponse> findAllByDate(LocalDate date);
-     MatchResponse findById(Long matchId);
+     MatchResponse findMatchResponseById(Long matchId);
+     Match findMatchById(Long matchId);
      MatchResponse update(Long matchId, MatchRequest matchRequest);
      void deleteById(Long matchId);
 }

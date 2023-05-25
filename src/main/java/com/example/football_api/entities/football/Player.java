@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(	name = "players")
@@ -13,12 +14,15 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 @ToString
-public class Player {
+public class  Player {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    private Team team;
+    @OneToMany(mappedBy = "player",
+            orphanRemoval = true,
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH})
+    private Set<PlayerTeamHistory> teams;
     @Column(length = 30, nullable = false)
     private String firstName;
     @Column(length = 30)

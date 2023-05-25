@@ -107,9 +107,14 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public MatchResponse findById(Long matchId) {
+    public MatchResponse findMatchResponseById(Long matchId) {
         Match match = findMatchByID(matchId);
         return matchMapper.map(match);
+    }
+
+    @Override
+    public Match findMatchById(Long matchId) {
+        return findMatchByID(matchId);
     }
 
     private Match findMatchByID(Long matchId) {

@@ -23,6 +23,7 @@ public class GoalMapper {
     public Goal map(GoalRequest goalRequest){
         return Goal.builder()
                 .isOwn(goalRequest.isOwn())
+                .time(goalRequest.getTime())
                 .build();
     }
 
