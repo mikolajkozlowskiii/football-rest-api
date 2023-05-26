@@ -12,14 +12,9 @@ import java.util.Set;
 
 public interface PlayerTeamHistoryService {
     PlayerTeamHistory save(PlayerTeamHistory playerTeamHistory);
-   // PlayerTeamHistory save(Player player, Team currentTeam);
     PlayerTeamHistory createNewPlayerTeamHistory(Player player, Team newTeam);
-
     Set<PlayerTeamHistory> getNewPlayerTeamHistories(PlayerTeamHistoryRequest playerTeamHistoryRequest, Player player);
     Set<PlayerTeamHistory> getUpdatedPlayerTeamHistories(Long playerId, PlayerTeamHistoryRequest playerTeamHistoryRequest, Player player);
-  //  PlayerHistory startsNewPlayerHistory(Player player);
-   // PlayerHistory endsPlayerHistory(Player player);
-   // PlayerHistory addNewTeamToPlayerHistory(Player player, Team team);
     List<PlayerTeamHistory> findByPlayerAndDateInRangeBeetweenStartsAndEnds(Player player, LocalDate date);
     PlayerTeamHistory findById(Long id);
     List<PlayerTeamHistory> findAllByTeam(Long teamId);

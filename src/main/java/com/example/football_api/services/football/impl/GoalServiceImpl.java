@@ -55,8 +55,23 @@ public class GoalServiceImpl implements GoalService {
 
     public void validateGoalRequest(Match match, Player player){
         // sprawdzic czy player mogl w ogole grac w tym meczu
+        //     @Query("SELECT DISTINCT p FROM Player p " +
+        //            "LEFT JOIN FETCH p.teams th " +
+        //            "LEFT JOIN FETCH th.team t " +
+        //            "WHERE t = :team AND :date BETWEEN th.start AND th.ends")
+        //    List<Player> findAllPlayersInTeamByDate(Team team, LocalDate date);
 
 
+        //    @Query("SELECT DISTINCT p FROM Player p " +
+        //            "LEFT JOIN FETCH p.teams th " +
+        //            "LEFT JOIN FETCH th.team t " +
+        //            "WHERE t = :team AND :date BETWEEN th.start AND th.ends AND th.player = :player")
+        //    List<PlayerTeamHistory> isPlayerExistsInTeamInCurrentDate(Team team, LocalDate date, Player player);
+        // sprawdzic dla teamAway i teamHome
+
+
+
+        //
 
         //playerTeamHistoryService.findByDateInRangeStartsAndEnds()
 
