@@ -5,7 +5,6 @@ import com.example.football_api.entities.football.Player;
 import com.example.football_api.entities.football.PlayerTeamHistory;
 import com.example.football_api.entities.football.Team;
 import com.example.football_api.exceptions.football.DateRangeNotAvailableException;
-import com.example.football_api.exceptions.football.PlayerHistoryNotFoundException;
 import com.example.football_api.exceptions.football.PlayerNotFoundException;
 import com.example.football_api.exceptions.football.TeamNotFoundException;
 import com.example.football_api.repositories.football.PlayerHistoryRepository;

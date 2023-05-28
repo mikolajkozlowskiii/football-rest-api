@@ -21,7 +21,7 @@ public class FootballOverviewMapper {
         return GoalOverview.builder()
                 .goalId(goal.getId())
                 .isOwn(goal.isOwn())
-                .playerId(goal.getId())
+                .playerId(goal.getPlayer().getId())
                 .time(goal.getTime())
                 .build();
     }

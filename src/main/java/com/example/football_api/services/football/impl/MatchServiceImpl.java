@@ -1,19 +1,18 @@
 package com.example.football_api.services.football.impl;
 
 import com.example.football_api.dto.football.request.MatchRequest;
+import com.example.football_api.dto.football.response.GoalResponse;
 import com.example.football_api.dto.football.response.MatchResponse;
-import com.example.football_api.entities.football.League;
-import com.example.football_api.entities.football.Match;
-import com.example.football_api.entities.football.Team;
+import com.example.football_api.entities.football.*;
 import com.example.football_api.exceptions.SortByException;
-import com.example.football_api.exceptions.football.LeagueNotContainTeamException;
-import com.example.football_api.exceptions.football.MatchNotFoundException;
+import com.example.football_api.exceptions.football.*;
+import com.example.football_api.repositories.football.GoalRepository;
 import com.example.football_api.repositories.football.MatchRepository;
-import com.example.football_api.services.football.LeagueService;
-import com.example.football_api.services.football.MatchService;
-import com.example.football_api.services.football.TeamService;
+import com.example.football_api.services.football.*;
 import com.example.football_api.services.football.mappers.MatchMapper;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -22,14 +21,29 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class MatchServiceImpl implements MatchService {
-    private final MatchRepository matchRepository;
-    private final MatchMapper matchMapper;
-    private final LeagueService leagueService;
-    private final TeamService teamService;
+    private MatchRepository matchRepository;
+    private MatchMapper matchMapper;
+    private LeagueService leagueService;
+    private TeamService teamService;
+    private GoalService goalService;
+    private PlayerTeamHistoryService playerTeamHistoryService;
+
+    public MatchServiceImpl(MatchRepository matchRepository, MatchMapper matchMapper,
+                            LeagueService leagueService, TeamService teamService,
+                            @Lazy GoalService goalService, @Lazy PlayerTeamHistoryService playerTeamHistoryService) {
+        this.matchRepository = matchRepository;
+        this.matchMapper = matchMapper;
+        this.leagueService = leagueService;
+        this.teamService = teamService;
+        this.goalService = goalService;
+        this.playerTeamHistoryService = playerTeamHistoryService;
+    }
+
     @Override
     public MatchResponse save(MatchRequest matchRequest) {
         Match match = getMatchEntity(matchRequest);
@@ -154,10 +168,41 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public MatchResponse update(Long matchId, MatchRequest matchRequest) {
-        Match match = getMatchEntity(matchRequest);
-        match.setId(matchId);
+        checkIfLeagueContainsTeams(matchRequest);
+        final Match match = findMatchByID(matchId);
 
-        return matchMapper.map(save(match));
+        validateRequestUpdateNumOfGoals(matchRequest, match);
+        validateRequestUpdateDate(matchRequest, match);
+
+        Match updatedMatch = getMatchEntity(matchRequest);
+        updatedMatch.setId(matchId);
+
+        return matchMapper.map(save(updatedMatch));
+    }
+
+    private void validateRequestUpdateDate(MatchRequest matchRequest, Match match) {
+        final List<Goal> goals = goalService.findGoalsByMatchId(match.getId());
+        final Set<Long> scorrersIds = goals.stream().map(s->s.getPlayer().getId()).collect(Collectors.toSet());
+        for(Long scorrerId : scorrersIds){
+            final Team beforeUpdateTeam = playerTeamHistoryService.findPlayerTeamByDate(scorrerId, match.getDate());
+            final Team afterUpdateTeam = playerTeamHistoryService.findPlayerTeamByDate(scorrerId, matchRequest.getDate());
+            if(!beforeUpdateTeam.equals(afterUpdateTeam)){
+                throw new DateInconsistencyViolationException(matchRequest.getDate());
+            }
+        }
+    }
+
+    private void validateRequestUpdateNumOfGoals(MatchRequest matchRequest, Match match) {
+        final int savedHomeTeamGoals = goalService.getTeamSavedNumOfGoals(match, match.getHomeTeam());
+        final int savedAwayTeamGoals = goalService.getTeamSavedNumOfGoals(match, match.getAwayTeam());
+        final int requestedHomeTeamGoals = matchRequest.getHomeTeamScore();
+        final int requestedAwayTeamGoals = matchRequest.getAwayTeamScore();
+        if(savedHomeTeamGoals > requestedHomeTeamGoals){
+            throw new SavedGoalsInconsistencyViolationException(requestedHomeTeamGoals, savedHomeTeamGoals);
+        }
+        if(savedAwayTeamGoals > requestedAwayTeamGoals){
+            throw new SavedGoalsInconsistencyViolationException(requestedAwayTeamGoals, savedAwayTeamGoals);
+        }
     }
 
     @Override

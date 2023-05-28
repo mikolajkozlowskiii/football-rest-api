@@ -59,6 +59,24 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Transactional
+    private void validateUpdatedGoal(Long changedGoalId, Goal updatedGoal) {
+        final Player scorer = updatedGoal.getPlayer();
+        final Match match = updatedGoal.getMatch();
+        final Team teamScorer = getTeamScorer(scorer.getId(), match, updatedGoal.isOwn());
+        int teamScorerGoalsInMatch;
+        teamScorerGoalsInMatch = getTeamScorerGoalsToPossibleSave(match, teamScorer);
+        long teamScorerSavedGoals = goalRepository
+                .findByMatch(match)
+                .stream()
+                .filter(s->!s.getId().equals(changedGoalId))
+                .map(s->getTeamScorer(s.getPlayer().getId(), s.getMatch(), s.isOwn()))
+                .filter(s->s.equals(teamScorer))
+                .count();
+
+        checkIfScorerTeamHasAlreadySavedAllGoals(match.getId(), teamScorerGoalsInMatch, teamScorerSavedGoals);
+    }
+
+    @Transactional
     private void validateGoal(Goal goal) {
         final Player scorer = goal.getPlayer();
         final Match match = goal.getMatch();
@@ -94,6 +112,14 @@ public class GoalServiceImpl implements GoalService {
             throw new TeamNotFoundInMatchException(teamScorer.getId(), match.getId());
         }
         return teamScorerGoalsToPossibleSave;
+    }
+
+    public int getTeamSavedNumOfGoals(Match match, Team team){
+        List<Goal> allSavedGoals = goalRepository.findByMatch(match);
+        return (int) allSavedGoals
+                .stream()
+                .map(s->getTeamScorer(s.getPlayer().getId(), match, s.isOwn()))
+                .filter(s->s.equals(team)).count();
     }
 
     private Team getTeamScorer(Long playerId, Match match, boolean isOwnGoal) {
@@ -136,9 +162,10 @@ public class GoalServiceImpl implements GoalService {
                 .isOwn(updateInfo.isOwn())
                 .match(match)
                 .player(player)
+                .time(updateInfo.getTime())
                 .build();
 
-        validateGoal(updatedGoal);
+        validateUpdatedGoal(goalId, updatedGoal);
         return goalMapper.map(save(updatedGoal));
     }
 
