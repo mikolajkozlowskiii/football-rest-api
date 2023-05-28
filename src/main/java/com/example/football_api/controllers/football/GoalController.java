@@ -2,13 +2,12 @@ package com.example.football_api.controllers.football;
 
 import com.example.football_api.dto.football.request.GoalRequest;
 import com.example.football_api.dto.football.response.GoalResponse;
-import com.example.football_api.dto.football.response.PlayerResponse;
+import com.example.football_api.dto.football.response.GoalShortResponse;
 import com.example.football_api.services.football.GoalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,11 +24,11 @@ public class GoalController {
     private final GoalService goalService;
     @GetMapping("/{id}")
     public ResponseEntity<GoalResponse> findGoalResponseById(@PathVariable Long id){
-        return ResponseEntity.ok(goalService.findGoalById(id));
+        return ResponseEntity.ok(goalService.findGoalResponseById(id));
     }
 
     @PostMapping()
-    public ResponseEntity<GoalResponse> findGoalResponseById(@RequestBody @Valid GoalRequest goalRequest){
+    public ResponseEntity<GoalResponse> saveGoal(@RequestBody @Valid GoalRequest goalRequest){
         GoalResponse createdGoal = goalService.saveGoal(goalRequest);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/goals/{id}")
                 .buildAndExpand(createdGoal.getId()).toUri();
@@ -39,7 +38,7 @@ public class GoalController {
 
     @PutMapping("/{id}")
     public ResponseEntity<GoalResponse> updateGoal(@PathVariable Long id,
-                                                             @RequestBody @Valid GoalRequest goalRequest){
+                                                   @RequestBody @Valid GoalRequest goalRequest){
         return ResponseEntity.ok(goalService.updateGoal(id, goalRequest));
     }
 
@@ -50,13 +49,13 @@ public class GoalController {
 
     @GetMapping("/matches/{matchId}")
     public ResponseEntity<List<GoalResponse>> findGoalsByMatchId(@PathVariable Long matchId){
-        return ResponseEntity.ok(goalService.findGoalsByMatchId(matchId));
+        return ResponseEntity.ok(goalService.findGoalsResponsesByMatchId(matchId));
     }
 
     @GetMapping
-    public ResponseEntity<Page<GoalResponse>> findAllGoals(@RequestParam(defaultValue = "0") Integer pageNo,
-                                                           @RequestParam(defaultValue = "4") Integer pageSize,
-                                                           @RequestParam(defaultValue = "date") String sortBy){
+    public ResponseEntity<Page<GoalShortResponse>> findAllGoals(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                                @RequestParam(defaultValue = "4") Integer pageSize,
+                                                                @RequestParam(defaultValue = "id") String sortBy){
         return ResponseEntity.ok(goalService.findAllGoals(PageRequest.of(pageNo, pageSize, Sort.by(sortBy))));
     }
 

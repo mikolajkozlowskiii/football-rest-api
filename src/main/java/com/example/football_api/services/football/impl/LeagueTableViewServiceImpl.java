@@ -17,6 +17,7 @@ public class LeagueTableViewServiceImpl implements LeagueTableViewService {
     @Override
     public List<LeagueTableView> getLeagueTableViewByLeagueId(Long leagueId) {
         leagueService.findLeagueById(leagueId);
+        System.out.println(leagueTableViewRepository.findByLeagueId(leagueId).size());
         return leagueTableViewRepository.findByLeagueId(leagueId);
     }
 }

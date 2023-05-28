@@ -47,7 +47,6 @@ public class LeagueController {
     @PutMapping("/{id}/teams")
     public ResponseEntity<LeagueResponse> addTeams(@PathVariable Long id,
                                                    @Valid @RequestBody ValidList<TeamRequest> teams){
-        System.out.println("dzieje sie");
         LeagueResponse leagueResponse = leagueService.addTeamsToLeague(id, teams);
         return ResponseEntity.ok(leagueResponse);
     }

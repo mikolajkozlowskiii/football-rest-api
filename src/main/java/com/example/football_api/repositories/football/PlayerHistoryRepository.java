@@ -27,6 +27,14 @@ public interface PlayerHistoryRepository extends JpaRepository<PlayerTeamHistory
             " AND pth.start <= :date AND (pth.ends IS NULL OR pth.ends >= :date)")
     List<PlayerTeamHistory> findByPlayerAndDateIsInRange(Player player, LocalDate date); // TODO change List to Optional
 
+    @Query("SELECT pth from PlayerTeamHistory pth" +
+            " left join fetch pth.team p" +
+            " left join fetch pth.player t" +
+            " where pth.team =:team" +
+            " AND (pth.start <= :date AND pth.ends >= :date)")
+    List<PlayerTeamHistory> findByTeamAndDate(@NotNull @Param("team")Team team,
+                                   @NotNull @Param("date")LocalDate date);
+
     @Query("SELECT CASE WHEN COUNT(pth) > 0 THEN false ELSE true END " +
             "FROM PlayerTeamHistory pth " +
             "WHERE pth.player.id = :playerId " +
@@ -35,6 +43,13 @@ public interface PlayerHistoryRepository extends JpaRepository<PlayerTeamHistory
     boolean isDateRangeAvailable(@NotNull @Param("playerId") Long playerId,
                                  @Param("starts") LocalDate starts,
                                  @Param("ends") LocalDate ends);
+
+    @Query("SELECT pth from PlayerTeamHistory pth " +
+            "left join fetch pth.team " +
+            "left join fetch pth.player " +
+            "where pth.player.id = :playerId AND " +
+            "(:date BETWEEN pth.start AND pth.ends)")
+    Optional<PlayerTeamHistory> findByPlayerAndDate(@Param("playerId") Long playerId, @Param("date") LocalDate date);
 
 
     /*

@@ -18,12 +18,19 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
     Optional<Match> findById(Long matchId); // !
 
     List<Match> findByLeagueId(Long leagueId); // !
+    List<Match> findByLeagueId(Long leagueId, Pageable pageable);
 
     @Query("SELECT m from Match m WHERE m.league.id = :leagueId and (m.awayTeam.id =: teamId or m.homeTeam.id =:teamId)")
     List<Match> findByLeagueIdAndTeamId(@Param("leagueId") Long leagueId, Long teamId);
 
+    @Query("SELECT m from Match m WHERE m.league.id = :leagueId and (m.awayTeam.id =: teamId or m.homeTeam.id =:teamId)")
+    Page<Match> findByLeagueIdAndTeamId(@Param("leagueId") Long leagueId, Long teamId, Pageable pageable);
+
     @Query("SELECT m FROM Match m WHERE m.date = CURRENT_DATE")
     List<Match> findAllByDateToday();
+
+    @Query("SELECT m FROM Match m WHERE m.date = CURRENT_DATE")
+    List<Match> findAllByDateToday(Pageable pageable);
 
     @Query("SELECT m FROM Match m WHERE m.date= :date")
     List<Match> findAllByDate(LocalDate date);

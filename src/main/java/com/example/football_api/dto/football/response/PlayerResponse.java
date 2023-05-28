@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Set;
 
@@ -19,5 +20,5 @@ public class PlayerResponse {
     private int height;
     private int weight;
     private boolean strongerFeet;
-    private Date birthDate;
+    private LocalDate birthDate;
 }

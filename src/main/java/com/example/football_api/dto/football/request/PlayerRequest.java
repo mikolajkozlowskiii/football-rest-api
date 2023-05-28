@@ -10,6 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.validator.constraints.Length;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Builder
@@ -18,9 +19,9 @@ import java.util.Date;
 @Setter
 public class PlayerRequest {
     private PlayerTeamHistoryRequest playerTeamHistoryRequest;
-    @NotBlank
     @Size(min = 2, max = 30)
     private String firstName;
+    @NotBlank
     @Size(min = 2, max = 30)
     private String lastName;
     @Length(min = 2, max = 3)
@@ -33,5 +34,5 @@ public class PlayerRequest {
     private int weight;
     private boolean strongerFeet;
     @JsonFormat(pattern="yyyy-MM-dd")
-    private Date birthDate;
+    private LocalDate birthDate;
 }

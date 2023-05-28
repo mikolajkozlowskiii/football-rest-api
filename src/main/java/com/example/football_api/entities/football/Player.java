@@ -3,6 +3,7 @@ package com.example.football_api.entities.football;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Set;
 
@@ -23,14 +24,14 @@ public class  Player {
             fetch = FetchType.LAZY,
             cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH})
     private Set<PlayerTeamHistory> teams;
-    @Column(length = 30, nullable = false)
-    private String firstName;
     @Column(length = 30)
+    private String firstName;
+    @Column(length = 30, nullable = false)
     private String lastName;
     @Column(length = 3)
     private String position;
     private int height;
     private int weight;
     private boolean strongerFeet;
-    private Date birthDate;
+    private LocalDate birthDate;
 }

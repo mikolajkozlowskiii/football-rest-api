@@ -3,6 +3,7 @@ package com.example.football_api.services.football.impl;
 import com.example.football_api.dto.football.request.PlayerRequest;
 import com.example.football_api.dto.football.request.PlayerTeamHistoryRequest;
 import com.example.football_api.dto.football.response.PlayerResponse;
+import com.example.football_api.entities.football.Match;
 import com.example.football_api.entities.football.Player;
 import com.example.football_api.entities.football.PlayerTeamHistory;
 import com.example.football_api.entities.football.Team;
@@ -43,6 +44,12 @@ public class PlayerServiceImpl implements PlayerService {
         Team team = teamService.findTeamById(teamId);
         List<Player> players = playerRepository.findAllCurrentPlayersInTeam(team);
         return players.stream().map(playerMapper::map).toList();
+    }
+
+    @Override
+    public List<Player> findByTeamIdPlayer(Long teamId) {
+        Team team = teamService.findTeamById(teamId);
+        return playerRepository.findAllCurrentPlayersInTeam(team);
     }
 
     private Player save(Player player){

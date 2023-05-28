@@ -89,21 +89,50 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public List<MatchResponse> findByLeagueIdAndTeamId(Long leagueId, Long teamId) {
+    public List<MatchResponse> findMatchesResponseByLeagueIdAndTeamId(Long leagueId, Long teamId) {
         List<Match> matches = matchRepository.findByLeagueIdAndTeamId(leagueId, teamId);
         return matches.stream().map(matchMapper::map).toList();
     }
 
     @Override
-    public List<MatchResponse> findAllByDateToday() {
+    public List<Match> findByLeagueIdAndTeamId(Long leagueId, Long teamId) {
+        return matchRepository.findByLeagueIdAndTeamId(leagueId, teamId);
+    }
+
+    @Override
+    public Page<Match> findByLeagueIdAndTeamId(Long leagueId, Long teamId, Pageable pageable) {
+        return matchRepository.findByLeagueIdAndTeamId(leagueId, teamId, pageable);
+    }
+
+    @Override
+    public List<Match> findByLeagueId(Long leagueId) {
+        return matchRepository.findByLeagueId(leagueId);
+    }
+
+    @Override
+    public List<Match> findByLeagueId(Long leagueId, Pageable pageable) {
+        return matchRepository.findByLeagueId(leagueId, pageable);
+    }
+
+    @Override
+    public List<MatchResponse> findAllByDateTodayMatchesResponse() {
         List<Match> matches = matchRepository.findAllByDateToday();
         return matches.stream().map(matchMapper::map).toList();
     }
-
     @Override
     public List<MatchResponse> findAllByDate(LocalDate date) {
         List<Match> matches = matchRepository.findAllByDate(date);
         return matches.stream().map(matchMapper::map).toList();
+    }
+
+    @Override
+    public List<Match> findAllByDateToday() {
+        return matchRepository.findAllByDateToday();
+    }
+
+    @Override
+    public List<Match> findAllByDateToday(Pageable pageable) {
+        return matchRepository.findAllByDateToday(pageable);
     }
 
     @Override

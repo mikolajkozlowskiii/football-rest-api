@@ -5,7 +5,7 @@ import jakarta.persistence.Id;
 import lombok.*;
 import net.jcip.annotations.Immutable;
 
-@Entity(name = "league_table_3")
+@Entity(name = "league_table_view")
 @Immutable
 @AllArgsConstructor
 @NoArgsConstructor

@@ -33,12 +33,12 @@ public class MatchController {
     @GetMapping("/league/{leagueId}/team/{teamId}")
     public ResponseEntity<List<MatchResponse>> findMatchesById(@PathVariable(name = "leagueId") Long leagueId,
                                                              @PathVariable(name = "teamId") Long teamId){
-        return ResponseEntity.ok(matchService.findByLeagueIdAndTeamId(leagueId, teamId));
+        return ResponseEntity.ok(matchService.findMatchesResponseByLeagueIdAndTeamId(leagueId, teamId));
     }
 
     @GetMapping("/today")
     public ResponseEntity<List<MatchResponse>> findTodaysMatches(){
-        return ResponseEntity.ok(matchService.findAllByDateToday());
+        return ResponseEntity.ok(matchService.findAllByDateTodayMatchesResponse());
     }
 
     @GetMapping("/date/{data}")

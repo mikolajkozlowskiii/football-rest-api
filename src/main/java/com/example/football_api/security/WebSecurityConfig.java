@@ -66,7 +66,7 @@ public class WebSecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeHttpRequests( // TODO refactor requestMatchers
                         s->s.requestMatchers("/api/v1/auth/**").permitAll()
-                                .requestMatchers("/api/v1/test/**").permitAll()
+                                .requestMatchers("/api/v1/test/**", "/api/v1/matches-view/**").permitAll()
                                 .requestMatchers("/api/v1/users/**").permitAll()
                                 .requestMatchers("/api/v1/matches/**").permitAll()
                                 .requestMatchers("/api/v1/players/**").permitAll()

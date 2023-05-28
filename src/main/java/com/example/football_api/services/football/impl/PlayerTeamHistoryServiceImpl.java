@@ -1,13 +1,13 @@
 package com.example.football_api.services.football.impl;
 
 import com.example.football_api.dto.football.request.PlayerTeamHistoryRequest;
-import com.example.football_api.dto.football.request.PlayerTeamRequest;
 import com.example.football_api.entities.football.Player;
 import com.example.football_api.entities.football.PlayerTeamHistory;
 import com.example.football_api.entities.football.Team;
 import com.example.football_api.exceptions.football.DateRangeNotAvailableException;
 import com.example.football_api.exceptions.football.PlayerHistoryNotFoundException;
 import com.example.football_api.exceptions.football.PlayerNotFoundException;
+import com.example.football_api.exceptions.football.TeamNotFoundException;
 import com.example.football_api.repositories.football.PlayerHistoryRepository;
 import com.example.football_api.services.football.PlayerTeamHistoryService;
 import com.example.football_api.services.football.TeamService;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,23 +30,14 @@ public class PlayerTeamHistoryServiceImpl implements PlayerTeamHistoryService {
     public PlayerTeamHistory save(PlayerTeamHistory playerTeamHistory) {
         return playerHistoryRepository.save(playerTeamHistory);
     }
-/*
-    @Override
-    public PlayerTeamHistory save(PlayerTeamHistory playerTeamHistory) {
-        final List<PlayerTeamHistory> allPlayerTeams = playerHistoryRepository.findByPlayer(playerTeamHistory.getPlayer());
-        PlayerTeamHistory latestPlayerTeamHistory = allPlayerTeams.stream().filter(s -> s.getEnds() == null).findFirst().orElse(null);
-        if(latestPlayerTeamHistory != null){
-            endsPlayerTeamHistory(latestPlayerTeamHistory);
-            if(latestPlayerTeamHistory.getTeam().equals(currentTeam)){
-                return latestPlayerTeamHistory;
-            }
-        }
-        //allPlayerTeams.stream().filter(s -> s.getEnds() == null).findFirst().ifPresent(this::endsPlayerTeamHistory);
-        final PlayerTeamHistory playerTeamHistory = createNewPlayerTeamHistory(player, currentTeam);
-        return save(playerTeamHistory);
-    }
-*/
 
+    @Override
+    public Team findPlayerTeamByDate(Long playerId, LocalDate date) {
+        return playerHistoryRepository
+                .findByPlayerAndDate(playerId, date)
+                .map(PlayerTeamHistory::getTeam)
+                .orElseThrow(() -> new TeamNotFoundException(playerId, date));
+    }
 
     @Override
     public Set<PlayerTeamHistory> getNewPlayerTeamHistories(PlayerTeamHistoryRequest playerTeamHistoryRequest, Player player) {
@@ -90,13 +82,15 @@ public class PlayerTeamHistoryServiceImpl implements PlayerTeamHistoryService {
     }
 
     @Override
-    public List<PlayerTeamHistory> findByPlayerAndDateInRangeBeetweenStartsAndEnds(Player player, LocalDate date) {
+    public List<PlayerTeamHistory> findByPlayerAndDate(Player player, LocalDate date) {
         final List<PlayerTeamHistory> playerTeamHistories =
                 playerHistoryRepository.findByPlayerAndDateIsInRange(player, date);
-        if(playerTeamHistories.isEmpty()){
-            throw new PlayerHistoryNotFoundException(player.getId(), date);
-        }
         return playerTeamHistories;
+    }
+
+    @Override
+    public List<Player> findPlayersByTeamAndDate(Team team, LocalDate date){
+        return  playerHistoryRepository.findByTeamAndDate(team, date).stream().map(PlayerTeamHistory::getPlayer).collect(Collectors.toList());
     }
 
     public PlayerTeamHistory createNewPlayerTeamHistory(Player player, Team currentTeam) {

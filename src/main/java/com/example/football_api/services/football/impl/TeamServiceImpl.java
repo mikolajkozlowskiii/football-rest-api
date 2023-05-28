@@ -4,6 +4,7 @@ import com.example.football_api.dto.football.request.TeamRequest;
 import com.example.football_api.dto.football.response.LeagueResponse;
 import com.example.football_api.dto.football.response.TeamResponse;
 import com.example.football_api.entities.football.Team;
+import com.example.football_api.exceptions.football.TeamAlreadyExistsException;
 import com.example.football_api.exceptions.football.TeamNotFoundException;
 import com.example.football_api.repositories.football.TeamRepository;
 import com.example.football_api.services.football.TeamService;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -28,8 +30,16 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public TeamResponse save(TeamRequest teamRequest) {
         Team team = teamMapper.map(teamRequest);
+        validateTeamName(team.getName());
         save(team);
         return teamMapper.map(team);
+    }
+
+    private void validateTeamName(String teamName){
+        Team team = teamRepository.findByName(teamName).orElse(null);
+        if (!Objects.isNull(team)){
+            throw new TeamAlreadyExistsException(teamName);
+        }
     }
 
     @Override

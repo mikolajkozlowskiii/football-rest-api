@@ -85,17 +85,7 @@ public class LeagueServiceImpl implements LeagueService {
     @Override
     public List<LeagueResponse> searchLeaguesByNameSeasonCountryOfficial
             (String name, String season, String country, boolean isOfficial) {
-        List<LeagueResponse> leagueResponses = searchLeaguesByNameSeasonAndCountry(name, season, country);
-
-        return (isOfficial)?
-                leagueResponses
-                        .stream()
-                        .filter(LeagueResponse::isOfficial)
-                        .toList():
-                leagueResponses
-                        .stream()
-                        .filter(s->!s.isOfficial())
-                        .toList();
+        return searchLeaguesByNameSeasonAndCountry(name, season, country);
     }
 
     private List<LeagueResponse> searchLeaguesByNameSeasonAndCountry(String name, String season, String country) {

@@ -2,23 +2,27 @@ package com.example.football_api.services.football.impl;
 
 import com.example.football_api.dto.football.request.GoalRequest;
 import com.example.football_api.dto.football.response.GoalResponse;
+import com.example.football_api.dto.football.response.GoalShortResponse;
 import com.example.football_api.entities.football.*;
 import com.example.football_api.exceptions.football.GoalNotFoundException;
+import com.example.football_api.exceptions.football.PlayerNotFoundInMatchException;
+import com.example.football_api.exceptions.football.TeamNotFoundInMatchException;
+import com.example.football_api.exceptions.football.TooManyGoalsException;
 import com.example.football_api.repositories.football.GoalRepository;
 import com.example.football_api.services.football.GoalService;
 import com.example.football_api.services.football.MatchService;
 import com.example.football_api.services.football.PlayerService;
 import com.example.football_api.services.football.PlayerTeamHistoryService;
 import com.example.football_api.services.football.mappers.GoalMapper;
+import com.sun.jdi.InternalException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +34,7 @@ public class GoalServiceImpl implements GoalService {
     private final PlayerTeamHistoryService playerTeamHistoryService;
 
     @Override
-    public GoalResponse findGoalById(Long id) {
+    public GoalResponse findGoalResponseById(Long id) {
         final Goal goal = findById(id);
         return goalMapper.map(goal);
     }
@@ -43,62 +47,78 @@ public class GoalServiceImpl implements GoalService {
 
     @Override
     public GoalResponse saveGoal(GoalRequest goalRequest) {
-        Goal goal = goalMapper.map(goalRequest);
         Match match = matchService.findMatchById(goalRequest.getMatchId());
         Player player = playerService.findPlayerById(goalRequest.getPlayerId());
+        Goal goal = goalMapper.map(goalRequest);
 
         goal.setMatch(match);
         goal.setPlayer(player);
-        save(goal);
-        return goalMapper.map(goal);
+
+        validateGoal(goal);
+        return goalMapper.map(save(goal));
     }
 
-    public void validateGoalRequest(Match match, Player player){
-        // sprawdzic czy player mogl w ogole grac w tym meczu
-        //     @Query("SELECT DISTINCT p FROM Player p " +
-        //            "LEFT JOIN FETCH p.teams th " +
-        //            "LEFT JOIN FETCH th.team t " +
-        //            "WHERE t = :team AND :date BETWEEN th.start AND th.ends")
-        //    List<Player> findAllPlayersInTeamByDate(Team team, LocalDate date);
+    @Transactional
+    private void validateGoal(Goal goal) {
+        final Player scorer = goal.getPlayer();
+        final Match match = goal.getMatch();
+        final Team teamScorer = getTeamScorer(scorer.getId(), match, goal.isOwn());
+        int teamScorerGoalsInMatch;
+        teamScorerGoalsInMatch = getTeamScorerGoalsToPossibleSave(match, teamScorer);
+        long teamScorerSavedGoals = goalRepository
+                .findByMatch(match)
+                .stream()
+                .map(s->getTeamScorer(s.getPlayer().getId(), s.getMatch(), s.isOwn()))
+                .filter(s->s.equals(teamScorer))
+                .count();
 
+        checkIfScorerTeamHasAlreadySavedAllGoals(match.getId(), teamScorerGoalsInMatch, teamScorerSavedGoals);
+    }
 
-        //    @Query("SELECT DISTINCT p FROM Player p " +
-        //            "LEFT JOIN FETCH p.teams th " +
-        //            "LEFT JOIN FETCH th.team t " +
-        //            "WHERE t = :team AND :date BETWEEN th.start AND th.ends AND th.player = :player")
-        //    List<PlayerTeamHistory> isPlayerExistsInTeamInCurrentDate(Team team, LocalDate date, Player player);
-        // sprawdzic dla teamAway i teamHome
+    private  void checkIfScorerTeamHasAlreadySavedAllGoals(Long matchId, int teamScorerGoalsToPossibleSave, long teamScorerSavedGoals) {
+        if(teamScorerGoalsToPossibleSave == teamScorerSavedGoals){
+            throw new TooManyGoalsException(matchId);
+        }
+        else if(teamScorerGoalsToPossibleSave < teamScorerSavedGoals){
+            throw new InternalException("Too many goals in DB saved for match: " + matchId);
+        }
+    }
 
+    private int getTeamScorerGoalsToPossibleSave(Match match, Team teamScorer) {
+        int teamScorerGoalsToPossibleSave;
+        if(teamScorer.equals(match.getAwayTeam())){
+            teamScorerGoalsToPossibleSave = match.getHomeTeamScore();
+        } else if (teamScorer.equals(match.getHomeTeam())) {
+            teamScorerGoalsToPossibleSave = match.getAwayTeamScore();
+        } else {
+            throw new TeamNotFoundInMatchException(teamScorer.getId(), match.getId());
+        }
+        return teamScorerGoalsToPossibleSave;
+    }
 
-
-        //
-
-        //playerTeamHistoryService.findByDateInRangeStartsAndEnds()
-
-
-        // sprawdzic czy goal w ogole mogl pasc
-        final int homeTeamScore = match.getHomeTeamScore();
-        final int awayTeamScore = match.getAwayTeamScore();
-
-        // homeTeam i awayTeam
-        // czy player jest w homeTeam w tym okresie
-        // czy mogl zdobyc bramke? ( 3:2 -> 5 bramek, czy 5 rekordow goal dla tego meczu)
-        // czy mogl zdobyc bramke own lub !own
-        // ile mamy own goli dla tego meczu
-        // homeTeamScore = 3,List<Goal> allGoalsByMatchId = ....
-        // sprawdzenie czy to jest homeTeamScore czy awayTeamScore
-        // Player  player = Goal.getPlayer
-        // PlayerHistory playerHistory = getPlayerHistoryByDate(goal.getDate)
-        // Team currentPlayerTeam = playerHistory.getTeam()
-        // check if team == teamHome, else if team == teamaway, else throw error
-        // iterate current check goal
-
-
-        // jesli tak to sprawdzic czy mogl pasc jako samoboj czy nie
-        // jesli jako samoboj to player ma data beetwen match data i team id == awayTeamId
-        // // jesli jako normalny  to player ma data beetwen match data i team id == h
-        LocalDate matchDate = match.getDate();
-        Set<PlayerTeamHistory> playerHistory = player.getTeams();
+    private Team getTeamScorer(Long playerId, Match match, boolean isOwnGoal) {
+        final Team homeTeamDuringMatch = match.getHomeTeam();
+        final Team awayTeamDuringMatch = match.getAwayTeam();
+        final Team playerTeamDuringMatch = playerTeamHistoryService.findPlayerTeamByDate(playerId, match.getDate());
+        if(playerTeamDuringMatch.equals(homeTeamDuringMatch)){
+            if(!isOwnGoal){
+                return homeTeamDuringMatch;
+            }
+            else{
+                return awayTeamDuringMatch;
+            }
+        }
+        else if(playerTeamDuringMatch.equals(awayTeamDuringMatch)){
+            if(!isOwnGoal){
+                return awayTeamDuringMatch;
+            }
+            else{
+                return homeTeamDuringMatch;
+            }
+        }
+        else{
+            throw new PlayerNotFoundInMatchException(playerId, match.getId());
+        }
     }
 
     public Goal save(Goal goal){
@@ -117,8 +137,9 @@ public class GoalServiceImpl implements GoalService {
                 .match(match)
                 .player(player)
                 .build();
-        save(updatedGoal);
-        return goalMapper.map(updatedGoal);
+
+        validateGoal(updatedGoal);
+        return goalMapper.map(save(updatedGoal));
     }
 
     @Override
@@ -132,15 +153,21 @@ public class GoalServiceImpl implements GoalService {
     }
 
     @Override
-    public List<GoalResponse> findGoalsByMatchId(Long matchId) {
+    public List<GoalResponse> findGoalsResponsesByMatchId(Long matchId) {
         final Match match = matchService.findMatchById(matchId);
         final List<Goal> goals = goalRepository.findByMatch(match);
         return goals.stream().map(goalMapper::map).toList();
     }
 
     @Override
-    public Page<GoalResponse> findAllGoals(Pageable pageable) {
+    public List<Goal> findGoalsByMatchId(Long matchId) {
+        final Match match = matchService.findMatchById(matchId);
+        return goalRepository.findByMatch(match);
+    }
+
+    @Override
+    public Page<GoalShortResponse> findAllGoals(Pageable pageable) {
          final Page<Goal> goals = goalRepository.findAll(pageable);
-         return new PageImpl<GoalResponse>(goals.stream().map(goalMapper::map).toList());
+         return new PageImpl<GoalShortResponse>(goals.stream().map(goalMapper::mapToShortResponse).toList());
     }
 }

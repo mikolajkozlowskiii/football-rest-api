@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
                        LeagueNotFoundException.class,
                        TeamNotFoundException.class,
                        PlayerNotFoundException.class,
-                        MatchNotFoundException.class,
+                       MatchNotFoundException.class,
                        GoalNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseStatusException handleUsernameNotFoundException(RuntimeException ex) {
@@ -46,7 +46,11 @@ public class GlobalExceptionHandler {
                        DuplicateLeagueException.class,
                        LeagueNotContainTeamException.class,
                        DuplicateTeamsException.class,
-                        DateRangeNotAvailableException.class})
+                       DateRangeNotAvailableException.class,
+                       TooManyGoalsException.class,
+                        PlayerNotFoundInMatchException.class,
+                        TeamNotFoundInMatchException.class,
+                         TeamAlreadyExistsException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseStatusException handleAppException(RuntimeException ex) {
         return new ResponseStatusException(HttpStatus.CONFLICT, ex.getMessage(), ex);

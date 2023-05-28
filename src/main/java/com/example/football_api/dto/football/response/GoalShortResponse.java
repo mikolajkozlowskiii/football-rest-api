@@ -7,10 +7,10 @@ import lombok.ToString;
 @Builder
 @ToString
 @Getter
-public class GoalResponse {
+public class GoalShortResponse {
     private Long id;
-    private MatchResponse matchResponse;
-    private PlayerResponse playerResponse;
+    private Long matchId;
+    private Long playerId;
     private boolean isOwn;
     private int time;
 }
