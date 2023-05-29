@@ -1,6 +1,5 @@
 package com.example.football_api.dto.football.request;
 
-
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,9 +10,7 @@ import java.time.LocalDate;
 @Builder
 @ToString
 @Getter
-public class PlayerTeamHistoryRequest {
-    @NotNull
-    private Long playerId;
+public class TeamHistoryRequest {
     @NotNull
     private Long teamId;
     @NotNull

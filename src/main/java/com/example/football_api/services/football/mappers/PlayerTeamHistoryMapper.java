@@ -1,6 +1,5 @@
 package com.example.football_api.services.football.mappers;
 
-import com.example.football_api.dto.football.request.PlayerTeamHistoryRequest;
 import com.example.football_api.dto.football.response.PlayerTeamHistoryResponse;
 import com.example.football_api.entities.football.PlayerTeamHistory;
 import org.springframework.stereotype.Component;

@@ -1,8 +1,6 @@
 package com.example.football_api.dto.football.request;
 
-import com.example.football_api.entities.football.Team;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,14 +9,13 @@ import lombok.ToString;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Builder
 @ToString
 @Getter
 @Setter
 public class PlayerRequest {
-    private PlayerTeamHistoryRequest playerTeamHistoryRequest;
+    private TeamHistoryRequest teamHistoryRequest;
     @Size(min = 2, max = 30)
     private String firstName;
     @NotBlank

@@ -1,6 +1,9 @@
 package com.example.football_api.services.football.impl;
 
 import com.example.football_api.dto.football.request.PlayerTeamHistoryRequest;
+import com.example.football_api.dto.football.request.TeamHistoryRequest;
+import com.example.football_api.dto.football.response.PlayerTeamHistoryResponse;
+import com.example.football_api.entities.football.Goal;
 import com.example.football_api.entities.football.Player;
 import com.example.football_api.entities.football.PlayerTeamHistory;
 import com.example.football_api.entities.football.Team;
@@ -8,10 +11,14 @@ import com.example.football_api.exceptions.football.DateRangeNotAvailableExcepti
 import com.example.football_api.exceptions.football.PlayerNotFoundException;
 import com.example.football_api.exceptions.football.TeamNotFoundException;
 import com.example.football_api.repositories.football.PlayerHistoryRepository;
+import com.example.football_api.services.football.GoalService;
+import com.example.football_api.services.football.PlayerService;
 import com.example.football_api.services.football.PlayerTeamHistoryService;
 import com.example.football_api.services.football.TeamService;
 import com.example.football_api.services.football.mappers.PlayerTeamHistoryMapper;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,16 +26,30 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class PlayerTeamHistoryServiceImpl implements PlayerTeamHistoryService {
-    private final PlayerHistoryRepository playerHistoryRepository;
+    private PlayerHistoryRepository playerHistoryRepository;
+    private TeamService teamService;
+    private PlayerTeamHistoryMapper playerTeamHistoryMapper;
+    private GoalService goalService;
+    private PlayerService playerService;
 
-    private final TeamService teamService;
-    private final PlayerTeamHistoryMapper playerTeamHistoryMapper;
+    public PlayerTeamHistoryServiceImpl(PlayerHistoryRepository playerHistoryRepository,
+                                        TeamService teamService,
+                                        PlayerTeamHistoryMapper playerTeamHistoryMapper,
+                                        @Lazy GoalService goalService,
+                                        @Lazy PlayerService playerService) {
+        this.playerHistoryRepository = playerHistoryRepository;
+        this.teamService = teamService;
+        this.playerTeamHistoryMapper = playerTeamHistoryMapper;
+        this.goalService = goalService;
+        this.playerService = playerService;
+    }
+
     @Override
     public PlayerTeamHistory save(PlayerTeamHistory playerTeamHistory) {
         return playerHistoryRepository.save(playerTeamHistory);
     }
+
 
     @Override
     public Team findPlayerTeamByDate(Long playerId, LocalDate date) {
@@ -39,28 +60,43 @@ public class PlayerTeamHistoryServiceImpl implements PlayerTeamHistoryService {
     }
 
     @Override
-    public Set<PlayerTeamHistory> getNewPlayerTeamHistories(PlayerTeamHistoryRequest playerTeamHistoryRequest, Player player) {
-        final Team requestedTeam = teamService.findTeamById(playerTeamHistoryRequest.getTeamId());
+    public PlayerTeamHistoryResponse save(PlayerTeamHistoryRequest request) {
+        validDateRange(request.getPlayerId(), request.getStart(), request.getEnds());
+        final Player player = playerService.findPlayerById(request.getPlayerId());
+        final Team requestedTeam = teamService.findTeamById(request.getTeamId());
         final PlayerTeamHistory newPlayerTeam = PlayerTeamHistory.builder()
                 .team(requestedTeam)
                 .player(player)
-                .start(playerTeamHistoryRequest.getStart())
-                .ends(playerTeamHistoryRequest.getEnds())
+                .start(request.getStart())
+                .ends(request.getEnds())
+                .build();
+        return map(save(newPlayerTeam));
+    }
+
+    @Override
+    public Set<PlayerTeamHistory> getNewPlayerTeamHistories(TeamHistoryRequest teamHistoryRequest, Player player) {
+        final Team requestedTeam = teamService.findTeamById(teamHistoryRequest.getTeamId());
+        final PlayerTeamHistory newPlayerTeam = PlayerTeamHistory.builder()
+                .team(requestedTeam)
+                .player(player)
+                .start(teamHistoryRequest.getStart())
+                .ends(teamHistoryRequest.getEnds())
                 .build();
 
         return Set.of(newPlayerTeam);
     }
+    // TODO check if 2 args works
     @Override
-    public Set<PlayerTeamHistory> getUpdatedPlayerTeamHistories(Long playerId, PlayerTeamHistoryRequest playerTeamHistoryRequest, Player player) {
-        final LocalDate starts = playerTeamHistoryRequest.getStart();
-        final LocalDate ends = playerTeamHistoryRequest.getEnds();
+    public Set<PlayerTeamHistory> getUpdatedPlayerTeamHistories(Long playerId, TeamHistoryRequest teamHistoryRequest, Player player) {
+        final LocalDate starts = teamHistoryRequest.getStart();
+        final LocalDate ends = teamHistoryRequest.getEnds();
         Set<PlayerTeamHistory> playerTeamHistories = new HashSet<>();
         if (!Objects.isNull(playerId)){
             validDateRange(playerId, starts, ends);
             playerTeamHistories = playerHistoryRepository.findByPlayerId(playerId);
         }
         // TODO check if works without player instance to newPlayerTeam variable
-        final Team requestedTeam = teamService.findTeamById(playerTeamHistoryRequest.getTeamId());
+        final Team requestedTeam = teamService.findTeamById(teamHistoryRequest.getTeamId());
 
         final PlayerTeamHistory newPlayerTeam = PlayerTeamHistory.builder()
                 .team(requestedTeam)
@@ -76,6 +112,17 @@ public class PlayerTeamHistoryServiceImpl implements PlayerTeamHistoryService {
     private void validDateRange(Long playerId, LocalDate starts, LocalDate ends) {
         boolean isDateRangeAvailable = playerHistoryRepository.isDateRangeAvailable(playerId, starts, ends);
         if(!isDateRangeAvailable){
+            throw new DateRangeNotAvailableException(starts, ends);
+        }
+    }
+
+    private void validUpdateDateRange(Long playerId, LocalDate starts, LocalDate ends, PlayerTeamHistory beforeUpdateTeamHistory) {
+        int numOfPlayerTeamHistorySavedInDB = (int) playerHistoryRepository
+                .getAllPlayerTeamHistoryInRange(playerId, starts, ends)
+                .stream()
+                .peek(s-> System.out.println(s.getId()))
+                .count();
+        if(numOfPlayerTeamHistorySavedInDB>0){
             throw new DateRangeNotAvailableException(starts, ends);
         }
     }
@@ -109,6 +156,11 @@ public class PlayerTeamHistoryServiceImpl implements PlayerTeamHistoryService {
     }
 
     @Override
+    public PlayerTeamHistoryResponse findResponseById(Long id) {
+        return map(findById(id));
+    }
+
+    @Override
     public List<PlayerTeamHistory> findAllByTeam(Long teamId) {
         final Team team = teamService.findTeamById(teamId);
         return playerHistoryRepository
@@ -118,10 +170,90 @@ public class PlayerTeamHistoryServiceImpl implements PlayerTeamHistoryService {
     @Override
     public PlayerTeamHistory delete(Long id) {
         final PlayerTeamHistory playerTeamHistory = findById(id);
-        playerHistoryRepository.delete(playerTeamHistory);
+        delete(playerTeamHistory);
         return playerTeamHistory;
     }
 
+    @Override
+    public PlayerTeamHistoryResponse deleteResponse(Long id) {
+        return map(delete(id));
+    }
+
+    public void delete(PlayerTeamHistory playerTeamHistory){
+        deleteGoalsScoredWhileTeamHistoryDateRange(playerTeamHistory);
+        playerHistoryRepository.delete(playerTeamHistory);
+    }
+
+    private void deleteGoalsScoredWhileTeamHistoryDateRange(PlayerTeamHistory playerTeamHistory) {
+        List<Goal> goals = goalService.findByPlayerAndDatesRange(
+                playerTeamHistory.getPlayer(),
+                playerTeamHistory.getStart(),
+                playerTeamHistory.getEnds()
+        );
+        goals.forEach(s->goalService.deleteGoal(s.getId()));
+    }
+
+    @Override
+    public PlayerTeamHistory update(Long playerTeamHistoryId, PlayerTeamHistoryRequest request) {
+        PlayerTeamHistory playerTeamHistory = findById(playerTeamHistoryId);
+        validUpdateDateRange(playerTeamHistory.getPlayer().getId(), request.getStart(), request.getEnds(), playerTeamHistory);
+        removeGoals(request, playerTeamHistory);
+        final Player player = playerService.findPlayerById(request.getPlayerId());
+        final Team team = teamService.findTeamById(request.getTeamId());
+        playerTeamHistory.setPlayer(player);
+        playerTeamHistory.setTeam(team);
+        playerTeamHistory.setStart(request.getStart());
+        playerTeamHistory.setEnds(request.getEnds());
+        return save(playerTeamHistory);
+    }
+
+    @Override
+    public PlayerTeamHistoryResponse updateResponse(Long playerTeamHistoryId, PlayerTeamHistoryRequest playerTeamHistoryRequest) {
+        return map(update(playerTeamHistoryId, playerTeamHistoryRequest));
+    }
+
+    private PlayerTeamHistoryResponse map(PlayerTeamHistory playerTeamHistory){
+        return PlayerTeamHistoryResponse.builder()
+                .id(playerTeamHistory.getId())
+                .teamId(playerTeamHistory.getTeam().getId())
+                .playerId(playerTeamHistory.getPlayer().getId())
+                .start(playerTeamHistory.getStart())
+                .ends(playerTeamHistory.getEnds())
+                .build();
+    }
+    // TODO zle dziala!!!
+    private void removeGoals(PlayerTeamHistoryRequest request, PlayerTeamHistory playerTeamHistory) {
+        final LocalDate requestedStarts = request.getStart();
+        final LocalDate requestedEnds = request.getEnds();
+        final LocalDate savedStarts = playerTeamHistory.getStart();
+        final LocalDate savedEnds = playerTeamHistory.getEnds();
+        if(!request.getTeamId().equals(playerTeamHistory.getTeam().getId())){
+            deleteGoalsScoredWhileTeamHistoryDateRange(playerTeamHistory);
+        }
+        if (request.getTeamId().equals(playerTeamHistory.getTeam().getId()) &&
+                savedStarts.isBefore(requestedStarts)){
+            List<Goal> goals = goalService.findByPlayerAndDatesRange(
+                    playerTeamHistory.getPlayer(),
+                    savedStarts,
+                    requestedStarts
+            );
+            System.out.println("1");
+            goals.forEach(s-> System.out.println(s.getId()));
+            goals.forEach(s->goalService.deleteGoal(s.getId()));
+        }
+        if (request.getTeamId().equals(playerTeamHistory.getTeam().getId()) &&
+                savedEnds.isAfter(requestedEnds)){
+            List<Goal> goals = goalService.findByPlayerAndDatesRange(
+                    playerTeamHistory.getPlayer(),
+                    requestedEnds,
+                    savedEnds
+            );
+            System.out.println("2");
+            goals.forEach(s-> System.out.println(s.getId()));
+            goals.forEach(s->goalService.deleteGoal(s.getId()));
+        }
+    }
+   // "start": "2023-02-09",
     @Override
     public PlayerTeamHistory update(Long playerHistoryId, PlayerTeamHistory updateInfo) {
         PlayerTeamHistory playerTeamHistory = findById(playerHistoryId);

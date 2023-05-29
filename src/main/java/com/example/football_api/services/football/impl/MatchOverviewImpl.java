@@ -35,8 +35,6 @@ public class MatchOverviewImpl implements MatchOverviewService {
         final Set<GoalOverview> goalsOverview = goals.stream().map(overviewMapper::map).collect(Collectors.toSet());
         final Set<Player> homeTeamPlayers = new HashSet<>(playerTeamHistoryService.findPlayersByTeamAndDate(homeTeam, match.getDate()));
         final Set<Player> awayTeamPlayers = new HashSet<>(playerTeamHistoryService.findPlayersByTeamAndDate(awayTeam, match.getDate()));
-       // final Set<Player> homeTeamPlayer = new HashSet<>(playerService.findByTeamIdPlayer(homeTeam.getId()));
-       // final Set<Player> awayTeamPlayers = new HashSet<>(playerService.findByTeamIdPlayer(awayTeam.getId()));
         final TeamOverview homeTeamOverview = overviewMapper.map(homeTeamPlayers, homeTeam);
         final TeamOverview awayTeamOverview = overviewMapper.map(awayTeamPlayers, awayTeam);
         return MatchOverview.builder()
@@ -56,7 +54,6 @@ public class MatchOverviewImpl implements MatchOverviewService {
     public Page<MatchOverview> getMatchesOverviewByLeagueId(Long leagueId, Pageable pageable) {
          final League league = leagueService.findLeagueById(leagueId);
          final List<Match> matches =  matchService.findByLeagueId(leagueId, pageable);
-        System.out.println("size:  "+matches.size());
          return new PageImpl<MatchOverview>(
                  matches
                  .stream()

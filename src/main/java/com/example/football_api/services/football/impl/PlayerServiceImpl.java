@@ -1,9 +1,7 @@
 package com.example.football_api.services.football.impl;
 
 import com.example.football_api.dto.football.request.PlayerRequest;
-import com.example.football_api.dto.football.request.PlayerTeamHistoryRequest;
 import com.example.football_api.dto.football.response.PlayerResponse;
-import com.example.football_api.entities.football.Match;
 import com.example.football_api.entities.football.Player;
 import com.example.football_api.entities.football.PlayerTeamHistory;
 import com.example.football_api.entities.football.Team;
@@ -62,10 +60,10 @@ public class PlayerServiceImpl implements PlayerService {
         save(player);
         System.out.println(playerMapper.map(player));
         // TODO change Set to just PlayerTeamHistory, should work and also change getTeams.add()
-        if(Objects.isNull(playerRequest.getPlayerTeamHistoryRequest())){
+        if(Objects.isNull(playerRequest.getTeamHistoryRequest())){
             return playerMapper.map(player);
         }
-        Set<PlayerTeamHistory> teams = playerTeamHistoryService.getNewPlayerTeamHistories(playerRequest.getPlayerTeamHistoryRequest(), player);
+        Set<PlayerTeamHistory> teams = playerTeamHistoryService.getNewPlayerTeamHistories(playerRequest.getTeamHistoryRequest(), player);
         player.getTeams().addAll(teams);
         System.out.println(playerMapper.map(player));
         return playerMapper.map(save(player));
@@ -79,10 +77,10 @@ public class PlayerServiceImpl implements PlayerService {
         updatedPlayer.setTeams(player.getTeams());
         save(updatedPlayer);
         // TODO change Set to just PlayerTeamHistory, should work and also change getTeams.add()
-        if(Objects.isNull(playerRequest.getPlayerTeamHistoryRequest())){
+        if(Objects.isNull(playerRequest.getTeamHistoryRequest())){
             return playerMapper.map(updatedPlayer);
         }
-        Set<PlayerTeamHistory> teams = playerTeamHistoryService.getUpdatedPlayerTeamHistories(playerId, playerRequest.getPlayerTeamHistoryRequest(), updatedPlayer);
+        Set<PlayerTeamHistory> teams = playerTeamHistoryService.getUpdatedPlayerTeamHistories(playerId, playerRequest.getTeamHistoryRequest(), updatedPlayer);
         updatedPlayer.getTeams().addAll(teams);
         System.out.println(updatedPlayer.getTeams());
         return playerMapper.map(save(updatedPlayer));

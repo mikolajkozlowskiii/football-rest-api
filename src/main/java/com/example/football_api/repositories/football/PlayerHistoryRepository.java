@@ -44,6 +44,15 @@ public interface PlayerHistoryRepository extends JpaRepository<PlayerTeamHistory
                                  @Param("starts") LocalDate starts,
                                  @Param("ends") LocalDate ends);
 
+    @Query("SELECT pth " +
+            "FROM PlayerTeamHistory pth " +
+            "WHERE pth.player.id = :playerId " +
+            "AND (:starts BETWEEN pth.start AND pth.ends OR :ends BETWEEN pth.start AND pth.ends OR " +
+            "(:starts < pth.start and :ends > pth.ends))")
+    List<PlayerTeamHistory> getAllPlayerTeamHistoryInRange(@NotNull @Param("playerId") Long playerId,
+                                 @Param("starts") LocalDate starts,
+                                 @Param("ends") LocalDate ends);
+
     @Query("SELECT pth from PlayerTeamHistory pth " +
             "left join fetch pth.team " +
             "left join fetch pth.player " +

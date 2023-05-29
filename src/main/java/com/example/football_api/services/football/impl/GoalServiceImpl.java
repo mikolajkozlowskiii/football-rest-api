@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -127,7 +128,7 @@ public class GoalServiceImpl implements GoalService {
         final Team awayTeamDuringMatch = match.getAwayTeam();
         final Team playerTeamDuringMatch = playerTeamHistoryService.findPlayerTeamByDate(playerId, match.getDate());
         if(playerTeamDuringMatch.equals(homeTeamDuringMatch)){
-            if(!isOwnGoal){
+            if(isOwnGoal){
                 return homeTeamDuringMatch;
             }
             else{
@@ -135,7 +136,7 @@ public class GoalServiceImpl implements GoalService {
             }
         }
         else if(playerTeamDuringMatch.equals(awayTeamDuringMatch)){
-            if(!isOwnGoal){
+            if(isOwnGoal){
                 return awayTeamDuringMatch;
             }
             else{
@@ -143,6 +144,7 @@ public class GoalServiceImpl implements GoalService {
             }
         }
         else{
+            // TODO logger
             throw new PlayerNotFoundInMatchException(playerId, match.getId());
         }
     }
@@ -175,6 +177,12 @@ public class GoalServiceImpl implements GoalService {
         delete(goal);
         return goalMapper.map(goal);
     }
+
+    @Override
+    public List<Goal> findByPlayerAndDatesRange(Player player, LocalDate starts, LocalDate ends) {
+        return goalRepository.findByPlayerAndDatesRange(player, starts, ends);
+    }
+
     public void delete(Goal goal){
         goalRepository.delete(goal);
     }

@@ -5,10 +5,12 @@ import com.example.football_api.dto.football.response.GoalResponse;
 import com.example.football_api.dto.football.response.GoalShortResponse;
 import com.example.football_api.entities.football.Goal;
 import com.example.football_api.entities.football.Match;
+import com.example.football_api.entities.football.Player;
 import com.example.football_api.entities.football.Team;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface GoalService {
@@ -16,6 +18,7 @@ public interface GoalService {
     GoalResponse saveGoal(GoalRequest goalRequest);
     GoalResponse updateGoal(Long goalId, GoalRequest updateInfo);
     GoalResponse deleteGoal(Long id);
+    List<Goal> findByPlayerAndDatesRange(Player player, LocalDate starts, LocalDate ends);
     List<Goal> findGoalsByMatchId(Long matchId);
     List<GoalResponse> findGoalsResponsesByMatchId(Long matchId);
     Page<GoalShortResponse> findAllGoals(Pageable pageable);
