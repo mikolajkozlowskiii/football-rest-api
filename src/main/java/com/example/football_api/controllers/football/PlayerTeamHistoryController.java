@@ -2,7 +2,6 @@ package com.example.football_api.controllers.football;
 
 import com.example.football_api.dto.football.request.PlayerTeamHistoryRequest;
 import com.example.football_api.dto.football.response.PlayerTeamHistoryResponse;
-import com.example.football_api.entities.football.PlayerTeamHistory;
 import com.example.football_api.services.football.PlayerTeamHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -120,7 +120,7 @@ public class PlayerTeamHistoryServiceImpl implements PlayerTeamHistoryService {
         int numOfPlayerTeamHistorySavedInDB = (int) playerHistoryRepository
                 .getAllPlayerTeamHistoryInRange(playerId, starts, ends)
                 .stream()
-                .peek(s-> System.out.println(s.getId()))
+                .filter(s->!s.getTeam().getId().equals(beforeUpdateTeamHistory.getTeam().getId()))
                 .count();
         if(numOfPlayerTeamHistorySavedInDB>0){
             throw new DateRangeNotAvailableException(starts, ends);

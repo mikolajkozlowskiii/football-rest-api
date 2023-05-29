@@ -4,6 +4,7 @@ import com.example.football_api.dto.football.request.GoalRequest;
 import com.example.football_api.dto.football.response.GoalResponse;
 import com.example.football_api.dto.football.response.GoalShortResponse;
 import com.example.football_api.entities.football.*;
+import com.example.football_api.exceptions.AppException;
 import com.example.football_api.exceptions.football.GoalNotFoundException;
 import com.example.football_api.exceptions.football.PlayerNotFoundInMatchException;
 import com.example.football_api.exceptions.football.TeamNotFoundInMatchException;
@@ -83,7 +84,7 @@ public class GoalServiceImpl implements GoalService {
         final Match match = goal.getMatch();
         final Team teamScorer = getTeamScorer(scorer.getId(), match, goal.isOwn());
         int teamScorerGoalsInMatch;
-        teamScorerGoalsInMatch = getTeamScorerGoalsToPossibleSave(match, teamScorer);
+        teamScorerGoalsInMatch = teamScorer.equals(match.getHomeTeam())?match.getHomeTeamScore():match.getAwayTeamScore();
         long teamScorerSavedGoals = goalRepository
                 .findByMatch(match)
                 .stream()
@@ -99,7 +100,8 @@ public class GoalServiceImpl implements GoalService {
             throw new TooManyGoalsException(matchId);
         }
         else if(teamScorerGoalsToPossibleSave < teamScorerSavedGoals){
-            throw new InternalException("Too many goals in DB saved for match: " + matchId);
+            // TODO LOGGER
+            throw new AppException("Too many goals in DB saved for match: " + matchId);
         }
     }
 
@@ -127,8 +129,9 @@ public class GoalServiceImpl implements GoalService {
         final Team homeTeamDuringMatch = match.getHomeTeam();
         final Team awayTeamDuringMatch = match.getAwayTeam();
         final Team playerTeamDuringMatch = playerTeamHistoryService.findPlayerTeamByDate(playerId, match.getDate());
+        System.out.println("team founded by matychdate: " + playerTeamDuringMatch.getId() + ", " + match.getDate());
         if(playerTeamDuringMatch.equals(homeTeamDuringMatch)){
-            if(isOwnGoal){
+            if(!isOwnGoal){
                 return homeTeamDuringMatch;
             }
             else{
@@ -136,7 +139,7 @@ public class GoalServiceImpl implements GoalService {
             }
         }
         else if(playerTeamDuringMatch.equals(awayTeamDuringMatch)){
-            if(isOwnGoal){
+            if(!isOwnGoal){
                 return awayTeamDuringMatch;
             }
             else{
@@ -145,7 +148,7 @@ public class GoalServiceImpl implements GoalService {
         }
         else{
             // TODO logger
-            throw new PlayerNotFoundInMatchException(playerId, match.getId());
+            throw new PlayerNotFoundInMatchException(playerId, match.getId()); // throw appException
         }
     }
 
