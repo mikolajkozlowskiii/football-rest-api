@@ -26,6 +26,7 @@ public interface PlayerTeamHistoryService {
     PlayerTeamHistoryResponse findResponseById(Long id);
     List<PlayerTeamHistory> findAllByTeam(Long teamId);
     PlayerTeamHistory delete(Long id);
+    List<PlayerTeamHistoryResponse> findAll();
     PlayerTeamHistoryResponse deleteResponse(Long id);
     PlayerTeamHistory update(Long playerHistoryId, PlayerTeamHistory updateInfo);
 }

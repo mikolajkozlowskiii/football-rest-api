@@ -82,12 +82,13 @@ public class GoalServiceImpl implements GoalService {
         final Player scorer = goal.getPlayer();
         final Match match = goal.getMatch();
         final Team teamScorer = getTeamScorer(scorer.getId(), match, goal.isOwn());
-        int teamScorerGoalsInMatch;
-        teamScorerGoalsInMatch = getTeamScorerGoalsToPossibleSave(match, teamScorer);
+        System.out.println(teamScorer.getId());
+        int teamScorerGoalsInMatch = getTeamScorerGoalsToPossibleSave(match, teamScorer);
         long teamScorerSavedGoals = goalRepository
                 .findByMatch(match)
                 .stream()
                 .map(s->getTeamScorer(s.getPlayer().getId(), s.getMatch(), s.isOwn()))
+                .peek(s-> System.out.println(s.getId()))
                 .filter(s->s.equals(teamScorer))
                 .count();
 
@@ -128,7 +129,7 @@ public class GoalServiceImpl implements GoalService {
         final Team awayTeamDuringMatch = match.getAwayTeam();
         final Team playerTeamDuringMatch = playerTeamHistoryService.findPlayerTeamByDate(playerId, match.getDate());
         if(playerTeamDuringMatch.equals(homeTeamDuringMatch)){
-            if(isOwnGoal){
+            if(!isOwnGoal){
                 return homeTeamDuringMatch;
             }
             else{
@@ -136,7 +137,7 @@ public class GoalServiceImpl implements GoalService {
             }
         }
         else if(playerTeamDuringMatch.equals(awayTeamDuringMatch)){
-            if(isOwnGoal){
+            if(!isOwnGoal){
                 return awayTeamDuringMatch;
             }
             else{

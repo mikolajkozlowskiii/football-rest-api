@@ -7,6 +7,8 @@ import com.example.football_api.dto.users.response.ApiResponse;
 import com.example.football_api.dto.users.response.UserResponse;
 import com.example.football_api.security.userDetails.UserDetailsImpl;
 
+import java.util.List;
+
 public interface UserService {
     UserResponse findCurrentUserResponse(UserDetailsImpl currentUser);
     UserResponse findUserResponseByEmail(String email);
@@ -17,4 +19,8 @@ public interface UserService {
     ApiResponse removeModerator(String username);
     User findUserByEmail(String email);
     User findUserById(Long id);
+    List<User> findAllUsersWithOnlyUserRole();
+    List<User> findAllUsersWithOnlyModeratorRoleAndNotAdmin();
+    List<UserResponse> findAllUsersResponseWithOnlyUserRole();
+    List<UserResponse> findAllUsersResponseWithModeratorRoleAndNotAdmin();
 }

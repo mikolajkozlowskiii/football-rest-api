@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Objects;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -90,5 +91,15 @@ public class UserController {
         final ApiResponse apiResponse = userService.removeModerator(email);
 
         return new ResponseEntity< >(apiResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("/user-roles")
+    public ResponseEntity<List<UserResponse>> findAllUserWithUserRole(){
+        return ResponseEntity.ok(userService.findAllUsersResponseWithOnlyUserRole());
+    }
+
+    @GetMapping("/mod-roles")
+    public ResponseEntity<List<UserResponse>> findAllUserWithModRole(){
+        return ResponseEntity.ok(userService.findAllUsersResponseWithModeratorRoleAndNotAdmin());
     }
 }

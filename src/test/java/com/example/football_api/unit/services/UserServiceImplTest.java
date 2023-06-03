@@ -25,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -69,10 +70,11 @@ class UserServiceImplTest {
 
         when(userMapper.map(userDetails)).thenReturn(
                 UserResponse.builder()
-                .firstName(userDetails.getFirstName())
-                .lastName(userDetails.getLastName())
-                .email(userDetails.getEmail())
-                .build()
+                        .id(userDetails.getId())
+                        .firstName(userDetails.getFirstName())
+                        .lastName(userDetails.getLastName())
+                        .email(userDetails.getEmail())
+                        .build()
         );
         UserResponse actualResponse = userService.findCurrentUserResponse(userDetails);
 
@@ -104,6 +106,30 @@ class UserServiceImplTest {
         Assertions.assertThrows(UserNotFoundException.class, () -> userService.findUserResponseByEmail(emailNotFoundInRepo));
     }
 
+    @Test
+    public void findAllUserWithOnlyUserRole(){
+        final Role roleUser = new Role(ERole.ROLE_USER);
+        final Role roleModerator = new Role(ERole.ROLE_MODERATOR);
+        final Role roleAdmin = new Role(ERole.ROLE_ADMIN);
+
+        final User userWithUserRole = User.builder().id(1L).roles(Set.of(roleUser)).build();
+        final User secondUserWithUserRole = User.builder().id(2L).roles(Set.of(roleUser)).build();
+        final User userWithModRole = User.builder().roles(Set.of(roleModerator)).build();
+        final User userWithAdminRole = User.builder().roles(Set.of(roleAdmin)).build();
+        final User userWithUserAndModRole = User.builder().roles(Set.of(roleUser, roleModerator)).build();
+        final User userWithAdminAndModRole = User.builder().roles(Set.of(roleModerator, roleAdmin)).build();
+        final User userWithUserAndAdminRole = User.builder().roles(Set.of(roleUser, roleAdmin)).build();
+        final User userWithUserAndModAndAdminRole = User.builder().roles(Set.of(roleUser, roleModerator, roleAdmin)).build();
+        final List<User> allUsers = List.of(userWithUserRole, secondUserWithUserRole, userWithModRole, userWithAdminRole,
+                userWithUserAndModRole, userWithAdminAndModRole, userWithUserAndAdminRole, userWithUserAndModAndAdminRole);
+
+        when(userRepository.findAll()).thenReturn(allUsers);
+
+        List<User> expectedUsers = List.of(userWithUserRole, secondUserWithUserRole);
+        List<User> actualUsers = userService.findAllUsersWithOnlyUserRole();
+
+        Assertions.assertEquals(expectedUsers, actualUsers);
+    }
     @Test
     void updateUser_AccountBelongsToCurrentUser_AccountUpdated() {
         UpdateUserRequest updateRequest = UpdateUserRequest.builder()

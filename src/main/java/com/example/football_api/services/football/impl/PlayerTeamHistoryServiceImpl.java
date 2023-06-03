@@ -175,6 +175,14 @@ public class PlayerTeamHistoryServiceImpl implements PlayerTeamHistoryService {
     }
 
     @Override
+    public List<PlayerTeamHistoryResponse> findAll() {
+        return playerHistoryRepository
+                .findAll()
+                .stream()
+                .map(s -> playerTeamHistoryMapper.map(s))
+                .collect(Collectors.toList());
+    }
+    @Override
     public PlayerTeamHistoryResponse deleteResponse(Long id) {
         return map(delete(id));
     }
