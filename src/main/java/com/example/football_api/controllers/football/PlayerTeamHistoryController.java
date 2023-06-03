@@ -2,14 +2,10 @@ package com.example.football_api.controllers.football;
 
 import com.example.football_api.dto.football.request.PlayerTeamHistoryRequest;
 import com.example.football_api.dto.football.response.PlayerTeamHistoryResponse;
-import com.example.football_api.entities.football.PlayerTeamHistory;
-import com.example.football_api.repositories.football.PlayerHistoryRepository;
 import com.example.football_api.services.football.PlayerTeamHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -22,12 +18,6 @@ public class PlayerTeamHistoryController {
     public ResponseEntity<PlayerTeamHistoryResponse> findPlayerTeamHistoryById(@PathVariable Long id){
         return ResponseEntity.ok(playerTeamHistoryService.findResponseById(id));
     }
-
-    @GetMapping("/all")
-    public ResponseEntity<List<PlayerTeamHistoryResponse>> findAll(){
-        return ResponseEntity.ok(playerTeamHistoryService.findAll());
-    }
-
 
     @PostMapping()
     public ResponseEntity<PlayerTeamHistoryResponse> save(@RequestBody PlayerTeamHistoryRequest request){
