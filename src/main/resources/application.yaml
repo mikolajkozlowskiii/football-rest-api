@@ -43,6 +43,7 @@ app:
     authorizedRedirectUris:
       - https://fcfootball.azurewebsites.net/api/v1/test/all
       - https://fcfootball.azurewebsites.net/api/v1/auth/oauth2/token
+      - https://fc-football.azurewebsites.net/users/profile
 
 
 
