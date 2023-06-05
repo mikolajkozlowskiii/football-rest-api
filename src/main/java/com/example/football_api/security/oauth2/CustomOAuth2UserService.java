@@ -79,6 +79,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                         .build();
         Set<Role> roles = roleService.getRolesForUser();
         user.setRoles(roles);
+        System.out.println(user);
+        user.getRoles().forEach(s-> System.out.println(s.getName()));
         return user;
     }
 
