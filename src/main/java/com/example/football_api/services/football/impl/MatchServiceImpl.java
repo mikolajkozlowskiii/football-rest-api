@@ -96,7 +96,7 @@ public class MatchServiceImpl implements MatchService {
     public Page<MatchResponse> findAll(Pageable pageable) {
         try{
             Page<Match> matches = matchRepository.findAll(pageable);
-            return new PageImpl<MatchResponse>(matches.stream().map(matchMapper::map).toList());
+            return new PageImpl<MatchResponse>(matches.stream().map(s->matchMapper.map(s, goalService.findGoalsByMatchId(s.getId()))).toList());
         }catch (PropertyReferenceException ex){
             throw new SortByException(pageable.getSort().toString());
         }
@@ -105,7 +105,7 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public List<MatchResponse> findMatchesResponseByLeagueIdAndTeamId(Long leagueId, Long teamId) {
         List<Match> matches = matchRepository.findByLeagueIdAndTeamId(leagueId, teamId);
-        return matches.stream().map(matchMapper::map).toList();
+        return matches.stream().map(s->matchMapper.map(s, goalService.findGoalsByMatchId(s.getId()))).toList();
     }
 
     @Override
@@ -131,12 +131,12 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public List<MatchResponse> findAllByDateTodayMatchesResponse() {
         List<Match> matches = matchRepository.findAllByDateToday();
-        return matches.stream().map(matchMapper::map).toList();
+        return matches.stream().map(s->matchMapper.map(s, goalService.findGoalsByMatchId(s.getId()))).toList();
     }
     @Override
     public List<MatchResponse> findAllByDate(LocalDate date) {
         List<Match> matches = matchRepository.findAllByDate(date);
-        return matches.stream().map(matchMapper::map).toList();
+        return matches.stream().map(s->matchMapper.map(s, goalService.findGoalsByMatchId(s.getId()))).toList();
     }
 
     @Override
@@ -152,7 +152,7 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public MatchResponse findMatchResponseById(Long matchId) {
         Match match = findMatchByID(matchId);
-        return matchMapper.map(match);
+        return matchMapper.map(match, goalService.findGoalsByMatchId(matchId));
     }
 
     @Override

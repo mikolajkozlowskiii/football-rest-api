@@ -10,6 +10,7 @@ import lombok.ToString;
 public class GoalOverview {
     private Long goalId;
     private Long playerId;
+    private String playerLastName;
     private int time;
     private boolean isOwn;
 }
