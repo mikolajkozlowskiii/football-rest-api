@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 
@@ -48,6 +47,16 @@ public class MatchOverviewImpl implements MatchOverviewService {
                 .awayTeam(awayTeamOverview)
                 .goals(goalsOverview)
                 .build();
+    }
+
+    @Override
+    public Page<MatchOverview> getAll(Pageable pageable) {
+        final List<Match> matches =  matchService.findAll(pageable).stream().toList();
+        return new PageImpl<MatchOverview>(
+                matches
+                        .stream()
+                        .map(s->getMatchOverviewByMatchId(s.getId()))
+                        .collect(Collectors.toList()));
     }
 
     @Override

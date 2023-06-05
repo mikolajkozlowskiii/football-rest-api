@@ -93,10 +93,19 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public Page<MatchResponse> findAll(Pageable pageable) {
+    public Page<MatchResponse> findAllResponses(Pageable pageable) {
         try{
             Page<Match> matches = matchRepository.findAll(pageable);
             return new PageImpl<MatchResponse>(matches.stream().map(s->matchMapper.map(s, goalService.findGoalsByMatchId(s.getId()))).toList());
+        }catch (PropertyReferenceException ex){
+            throw new SortByException(pageable.getSort().toString());
+        }
+    }
+
+    @Override
+    public Page<Match> findAll(Pageable pageable) {
+        try{
+            return matchRepository.findAll(pageable);
         }catch (PropertyReferenceException ex){
             throw new SortByException(pageable.getSort().toString());
         }

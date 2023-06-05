@@ -21,6 +21,13 @@ public class MatchOverviewController {
         return ResponseEntity.ok(matchOverviewService.getMatchOverviewByMatchId(matchId));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<Page<MatchOverview>> getAllMatchesOverview(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                                     @RequestParam(defaultValue = "4") Integer pageSize,
+                                                                     @RequestParam(defaultValue = "date") String sortBy){
+        return ResponseEntity.ok(matchOverviewService.getAll(PageRequest.of(pageNo, pageSize, Sort.by(sortBy))));
+    }
+
     @GetMapping("/leagues/{leagueId}")
     public ResponseEntity<Page<MatchOverview>> getMatchesOverviewByLeagueId(@PathVariable Long leagueId,
                                                                             @RequestParam(defaultValue = "0") Integer pageNo,

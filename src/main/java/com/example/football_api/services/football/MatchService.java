@@ -12,7 +12,8 @@ import java.util.List;
 public interface MatchService {
      MatchResponse save(MatchRequest match);
      Match saveEntity(MatchRequest matchRequest);
-     Page<MatchResponse> findAll(Pageable pageable);
+     Page<MatchResponse> findAllResponses(Pageable pageable);
+     Page<Match> findAll(Pageable pageable);
      List<MatchResponse> findMatchesResponseByLeagueIdAndTeamId(Long leagueId, Long teamId);
      List<Match> findByLeagueIdAndTeamId(Long leagueId, Long teamId);
      Page<Match> findByLeagueIdAndTeamId(Long leagueId, Long teamId, Pageable pageable);

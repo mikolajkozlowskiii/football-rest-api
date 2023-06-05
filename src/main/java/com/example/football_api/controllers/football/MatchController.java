@@ -52,8 +52,16 @@ public class MatchController {
     public ResponseEntity<Page<MatchResponse>> searchMatches(@RequestParam(defaultValue = "0") Integer pageNo,
                                                              @RequestParam(defaultValue = "4") Integer pageSize,
                                                              @RequestParam(defaultValue = "date") String sortBy){
-        return ResponseEntity.ok(matchService.findAll(PageRequest.of(pageNo, pageSize, Sort.by(sortBy))));
+        return ResponseEntity.ok(matchService.findAllResponses(PageRequest.of(pageNo, pageSize, Sort.by(sortBy))));
     }
+
+    @GetMapping("/overview")
+    public ResponseEntity<Page<MatchResponse>> searchMatchesOverview(@RequestParam(defaultValue = "0") Integer pageNo,
+                                                             @RequestParam(defaultValue = "4") Integer pageSize,
+                                                             @RequestParam(defaultValue = "date") String sortBy){
+        return ResponseEntity.ok(matchService.findAllResponses(PageRequest.of(pageNo, pageSize, Sort.by(sortBy))));
+    }
+
     @PostMapping()
     public ResponseEntity<MatchResponse> saveMatch(@Valid @RequestBody MatchRequest matchRequest){
         MatchResponse createdMatch = matchService.save(matchRequest);

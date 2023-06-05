@@ -1,7 +1,6 @@
 package com.example.football_api.unit.services;
 
 import com.example.football_api.dto.football.request.MatchRequest;
-import com.example.football_api.dto.football.response.MatchResponse;
 import com.example.football_api.entities.football.League;
 import com.example.football_api.entities.football.Match;
 import com.example.football_api.entities.football.Team;
@@ -20,11 +19,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @ExtendWith(MockitoExtension.class)
@@ -103,7 +100,7 @@ public class MatchServiceTest {
                 .build();
 
        // when(matchRepository.findAll(any(PageRequest.of(0,10, Sort.by("leagueId"))))).thenReturn(Page.of)
-        matchService.findAll(PageRequest.of(0,10, Sort.by("leagueId")));
+        matchService.findAllResponses(PageRequest.of(0,10, Sort.by("leagueId")));
 
     }
 
