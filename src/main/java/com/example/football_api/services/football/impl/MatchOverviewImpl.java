@@ -11,9 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,7 +29,7 @@ public class MatchOverviewImpl implements MatchOverviewService {
         final Team homeTeam = match.getHomeTeam();
         final Team awayTeam = match.getAwayTeam();
         final List<Goal> goals = goalService.findGoalsByMatchId(matchId);
-        final Set<GoalOverview> goalsOverview = goals.stream().map(overviewMapper::map).collect(Collectors.toSet());
+        final Set<GoalOverview> goalsOverview = goals.stream().map(overviewMapper::map).sorted(Comparator.comparingInt(GoalOverview::getTime)).collect(Collectors.toCollection(LinkedHashSet::new));
         final Set<Player> homeTeamPlayers = new HashSet<>(playerTeamHistoryService.findPlayersByTeamAndDate(homeTeam, match.getDate()));
         final Set<Player> awayTeamPlayers = new HashSet<>(playerTeamHistoryService.findPlayersByTeamAndDate(awayTeam, match.getDate()));
         final TeamOverview homeTeamOverview = overviewMapper.map(homeTeamPlayers, homeTeam);
